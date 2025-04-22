@@ -4,20 +4,20 @@ import { Card } from './card.model';
 @Entity('seasons')
 export class Season {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  startDate: Date;
+  startDate!: Date;
 
   @Column()
-  endDate: Date;
+  endDate!: Date;
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @OneToMany(() => Card, card => card.season)
-  cards: Card[];
+  cards!: Card[];
 }

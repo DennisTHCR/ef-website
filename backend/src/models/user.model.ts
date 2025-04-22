@@ -4,29 +4,29 @@ import { Card } from './card.model';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  username: string;
+  username!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column({ default: 0 })
-  coins: number;
+  coins!: number;
 
   @Column({ default: 0 })
-  rating: number;
+  rating!: number;
 
   @OneToMany(() => Card, card => card.owner)
-  cards: Card[];
+  cards!: Card[];
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   @Column({ default: new Date() })
-  lastPackClaim: Date;
+  lastPackClaim!: Date;
 }

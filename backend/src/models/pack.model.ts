@@ -4,17 +4,17 @@ import { User } from './user.model';
 @Entity('packs')
 export class Pack {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  seasonId: number;
+  seasonId!: number;
 
   @ManyToOne(() => User)
-  owner: User;
+  owner!: User;
 
   @Column({ default: false })
-  isOpened: boolean;
+  isOpened!: boolean;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 }
