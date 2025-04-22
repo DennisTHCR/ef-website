@@ -1,13 +1,14 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Quote } from './quote.model';
 @Entity('teachers')
 export class Teacher {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToMany(() => String)
-  quote: String;
+  @OneToMany(() => Quote, quote => quote.teacher)
+  quotes: Quote[];
 
-  @OneToMany(() => String)
+  @Column()
   name: String;
 
   @CreateDateColumn()
