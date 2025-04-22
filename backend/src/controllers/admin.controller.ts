@@ -41,7 +41,7 @@ export class AdminController {
       const subjectRepository = getRepository(Subject);
 
       // Find subjects if provided
-      let subjects = [];
+      let subjects: Subject[] = [];
       if (subjectIds.length > 0) {
         subjects = await subjectRepository.findByIds(subjectIds);
       }
