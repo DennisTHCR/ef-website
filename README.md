@@ -26,7 +26,7 @@ This website is a project for the EF Informatik. The goal is to create a website
 - [ ] Card Trading
 ## Tasks
 ### Backend
-- [ ] Microsoft Authentication
+- [ ] Authentication
 - [ ] Database
 - [ ] Elo system
 - [ ] REST API
