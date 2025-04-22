@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import { Card } from '../models/card.model';
 import { User } from '../models/user.model';
 import { Season } from '../models/season.model';
+import { Teacher } from '../models/teacher.model';
 import { Pack } from '../models/pack.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 
@@ -52,6 +53,7 @@ export class CardController {
       const userRepository = getRepository(User);
       const cardRepository = getRepository(Card);
       const seasonRepository = getRepository(Season);
+      const teacherRepository = getRepository(Teacher);
 
       // Find an unopened pack owned by the user
       const pack = await packRepository.findOne({
@@ -77,34 +79,41 @@ export class CardController {
         return;
       }
 
+      // Get all teachers with their subjects and quotes
+      const teachers = await teacherRepository.find({
+        relations: ['quotes', 'subjects'],
+      });
+
+      if (teachers.length === 0) {
+        res.status(404).json({ message: 'No teachers found in database' });
+        return;
+      }
+
       // Generate 3 random cards
       const newCards = [];
-      const teachers = ['Mr. Smith', 'Ms. Johnson', 'Dr. Lee', 'Mrs. Garcia', 'Prof. Williams', 'Dr. Miller'];
-      const subjects = ['Math', 'Science', 'History', 'English', 'Art', 'Music', 'PE', 'Computer Science'];
-      const quotes = [
-        'Education is not the filling of a pail, but the lighting of a fire.',
-        'The beautiful thing about learning is that no one can take it away from you.',
-        'Education is the most powerful weapon which you can use to change the world.',
-        'The mind is not a vessel to be filled, but a fire to be kindled.',
-        'Knowledge is power.',
-        'Learning is a treasure that will follow its owner everywhere.',
-        'The more that you read, the more things you will know.',
-        'Education is the passport to the future.',
-        'A good education is a foundation for a better future.',
-        'The roots of education are bitter, but the fruit is sweet.'
-      ];
 
       for (let i = 0; i < 3; i++) {
+        // Select a random teacher
         const randomTeacher = teachers[Math.floor(Math.random() * teachers.length)];
-        const randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
+        // Select a random subject from the teacher's subjects
+        const randomSubject = randomTeacher.subjects.length > 0
+          ? randomTeacher.subjects[Math.floor(Math.random() * randomTeacher.subjects.length)]
+          : null;
+
+        // Select a random quote from the teacher's quotes
+        const randomQuote = randomTeacher.quotes.length > 0
+          ? randomTeacher.quotes[Math.floor(Math.random() * randomTeacher.quotes.length)]
+          : null;
+
+        // Create and save a new card
         const card = cardRepository.create({
-          teacherName: randomTeacher,
-          subject: randomSubject,
-          quote: randomQuote,
+          teacherName: randomTeacher.name,
+          subject: randomSubject ? randomSubject.name : 'General',
+          quote: randomQuote ? randomQuote.text : 'No quote available',
           owner: req.user,
           season,
+          teacher: randomTeacher,
         });
 
         await cardRepository.save(card);
@@ -124,7 +133,6 @@ export class CardController {
       res.status(500).json({ message: 'Server error' });
     }
   }
-
   // Claim daily pack
   async claimDailyPack(req: AuthRequest, res: Response): Promise<void> {
     try {

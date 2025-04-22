@@ -8,7 +8,7 @@ export class TrainerController {
   // Get top trainers
   async getTopTrainers(req: Request, res: Response): Promise<void> {
     try {
-      const { limit = 10 } = req.query;
+      const { limit = 100 } = req.query;
 
       const userRepository = getRepository(User);
       const topTrainers = await userRepository.find({

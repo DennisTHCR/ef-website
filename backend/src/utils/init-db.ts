@@ -11,7 +11,7 @@ export const initializeDatabase = async (): Promise<void> => {
       // Create the first season
       const now = new Date();
       const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 3); // Season lasts 3 months
+      endDate.setDate(endDate.getDate() + 7); // Season lasts 3 months
 
       const firstSeason = seasonRepository.create({
         name: 'Season 1',
