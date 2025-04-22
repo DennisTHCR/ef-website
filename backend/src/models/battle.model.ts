@@ -5,20 +5,20 @@ import { User } from './user.model';
 @Entity('battles')
 export class Battle {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string;
 
   @ManyToOne(() => Card)
-  card1!: Card;
+  card1: Card;
 
   @ManyToOne(() => Card)
-  card2!: Card;
+  card2: Card;
 
   @ManyToOne(() => User)
-  voter!: User;
+  voter: User;
 
   @Column()
-  winnerId!: string;
+  winnerId: string;
 
   @CreateDateColumn()
-  battleDate!: Date;
+  battleDate: Date;
 }

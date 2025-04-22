@@ -218,7 +218,6 @@ export class TradeController {
       const trades = await tradeRepository.find({
         where: [
           { status: 'pending', offeredTo: { id: req.user?.id } }, // Trades offered to the user
-          { status: 'pending', offeredTo: null }, // Public trades
         ],
         relations: ['offeredBy', 'offeredTo', 'offeredCard', 'requestedCard'],
       });

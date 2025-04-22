@@ -5,32 +5,32 @@ import { Season } from './season.model';
 @Entity('cards')
 export class Card {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string;
 
   @Column()
-  teacherName!: string;
+  teacherName: string;
 
   @Column()
-  subject!: string;
+  subject: string;
 
   @Column()
-  quote!: string;
+  quote: string;
 
   @Column({ default: 1000 }) // Starting Elo rating
-  rating!: number;
+  rating: number;
 
   @Column({ default: 1 })
-  level!: number;
+  level: number;
 
   @ManyToOne(() => User, user => user.cards)
-  owner!: User;
+  owner: User | undefined;
 
   @ManyToOne(() => Season)
-  season!: Season;
+  season: Season;
 
   @Column({ default: 0 })
-  wins!: number;
+  wins: number;
 
   @Column({ default: 0 })
-  losses!: number;
+  losses: number;
 }
