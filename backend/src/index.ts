@@ -27,6 +27,7 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/battles', battleRoutes);
 app.use('/api/trainers', trainerRoutes);
 app.use('/api/trades', tradeRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);
