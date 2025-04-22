@@ -77,7 +77,7 @@ export class AdminController {
       const quoteRepository = getRepository(Quote);
 
       // Find teacher
-      const teacher = await teacherRepository.findOne(id);
+      const teacher = await teacherRepository.findOneBy({ id });
 
       if (!teacher) {
         return res.status(404).json({ message: 'Teacher not found' });
@@ -113,8 +113,10 @@ export class AdminController {
       const teacherRepository = getRepository(Teacher);
       const subjectRepository = getRepository(Subject);
 
-      // Find teacher with existing subjects
-      const teacher = await teacherRepository.findOne(id, { relations: ['subjects'] });
+      const teacher = await teacherRepository.findOne({
+        where: { id },
+        relations: ['subjects']
+      });
 
       if (!teacher) {
         return res.status(404).json({ message: 'Teacher not found' });
