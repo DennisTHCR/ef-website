@@ -1,11 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
-import { User } from './user.model';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Season } from './season.model';
 
 @Entity('cards')
 export class Card {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  type: string;
 
   @Column()
   teacherName: string;
@@ -22,11 +21,8 @@ export class Card {
   @Column({ default: 1 })
   level: number;
 
-  @ManyToOne(() => User, user => user.cards)
-  owner: User | undefined;
-
-  @ManyToOne(() => Season)
-  season: Season;
+  @ManyToOne(() => Season, season => season.id)
+  seasonId: number;
 
   @Column({ default: 0 })
   wins: number;

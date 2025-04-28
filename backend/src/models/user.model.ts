@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Card } from './card.model';
+import { DealtCard } from './dealt_card.model';
 
 @Entity('users')
 export class User {
@@ -18,8 +18,8 @@ export class User {
   @Column({ default: 0 })
   rating: number;
 
-  @OneToMany(() => Card, card => card.owner)
-  cards: Card[];
+  @OneToMany(() => DealtCard, card => card.owner)
+  cards: DealtCard[];
 
   @CreateDateColumn()
   createdAt: Date;
