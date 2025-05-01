@@ -8,6 +8,7 @@ import battleRoutes from './routes/battle.routes';
 import trainerRoutes from './routes/trainer.routes';
 import tradeRoutes from './routes/trade.routes';
 import adminRoutes from './routes/admin.routes';
+import seasonRoutes from './routes/season.routes';
 import { errorMiddleware } from './middleware/error.middleware';
 import { dbConfig } from './config/database';
 
@@ -28,6 +29,7 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/battles', battleRoutes);
 app.use('/api/trainers', trainerRoutes);
 app.use('/api/trades', tradeRoutes);
+app.use('/api/seasons', seasonRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
