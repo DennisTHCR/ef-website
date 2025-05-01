@@ -3,6 +3,8 @@ import { getRepository } from 'typeorm';
 import { Season } from '../models/season.model';
 import { Card } from '../models/card.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { Quote } from '../models/quote.model';
+import { Teacher } from '../models/teacher.model';
 
 export class SeasonController {
   // Get all seasons
@@ -78,11 +80,63 @@ export class SeasonController {
 
   async startNewSeason(req: Request, res: Response): Promise<void> {
     try {
+      const { name } = req.body;
+
+      if (!name) {
+        res.status(400).json({ message: 'Season name is required' });
+        return;
+      }
+
       const seasonRepository = getRepository(Season);
-      const { name } = req.params;
-      const season = new Season();
-      season.name = name;
-      seasonRepository.save(season);
+      const teacherRepository = getRepository(Teacher);
+      const cardRepository = getRepository(Card);
+
+      // Set all current active seasons to inactive
+      await seasonRepository
+        .createQueryBuilder()
+        .update(Season)
+        .set({ isActive: false })
+        .where("isActive = :isActive", { isActive: true })
+        .execute();
+
+      // Create new season
+      const season = seasonRepository.create({
+        name,
+        isActive: true,
+        startDate: new Date(),
+        endDate: new Date(new Date().setDate(new Date().getDate() + 7))
+      });
+
+      await seasonRepository.save(season);
+
+      const teachers = await teacherRepository.find({
+        relations: ['subjects', 'quotes'],
+      });
+
+      for (const teacher of teachers) {
+        if (teacher.subjects && teacher.subjects.length > 0) {
+          for (const subject of teacher.subjects) {
+            let randomQuote: Quote | null = null;
+            if (teacher.quotes && teacher.quotes.length > 0) {
+              const randomIndex = Math.floor(Math.random() * teacher.quotes.length);
+              randomQuote = teacher.quotes[randomIndex];
+            }
+
+            let card = new Card();
+            card.teacherName = teacher.name;
+            card.subject = subject.name;
+            card.quote = randomQuote?.text!;
+            card.season = season;
+
+            cardRepository.save(card);
+          }
+        }
+      }
+
+      res.status(201).json({
+        message: 'New season started successfully',
+        season
+      });
     } catch (error) {
       console.error('Create new season error:', error);
       res.status(500).json({ message: 'Server error' });

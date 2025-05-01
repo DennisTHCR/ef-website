@@ -1,37 +1,10 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import { Teacher } from '../models/teacher.model';
 import { Quote } from '../models/quote.model';
 import { Subject } from '../models/subject.model';
-import { SeasonController } from './season.controller';
 
 export class AdminController {
-  public router = Router();
-
-  constructor() {
-    this.initializeRoutes();
-  }
-
-  private initializeRoutes() {
-    // Admin authentication middleware
-    const authenticate = (req: Request, res: Response, next: Function) => {
-      const adminPassword = req.headers['admin-password'];
-
-      if (!adminPassword || adminPassword !== "alanleyel") {
-        return res.status(401).json({ message: 'Unauthorized' });
-      }
-
-      next();
-    };
-
-    const seasonController = new SeasonController();
-
-    // Protected routes
-    this.router.post('/teachers', authenticate, this.createTeacher);
-    this.router.post('/teachers/:id/quotes', authenticate, this.addQuoteToTeacher);
-    this.router.post('/teachers/:id/subjects', authenticate, this.addSubjectToTeacher);
-    this.router.post('/seasons', authenticate, seasonController.startNewSeason);
-  }
 
   async createTeacher(req: Request, res: Response) {
     try {

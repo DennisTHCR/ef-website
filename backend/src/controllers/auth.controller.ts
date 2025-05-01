@@ -26,6 +26,7 @@ export class AuthController {
       const user = userRepository.create({
         username,
         password: hashedPassword,
+        lastPackClaim: new Date(new Date().setDate(new Date().getDate() - 1)),
       });
 
       await userRepository.save(user);
