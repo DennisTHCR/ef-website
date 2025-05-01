@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import { Trade } from '../models/trade.model';
-import { Card } from '../models/card.model';
 import { User } from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { DealtCard } from '../models/dealt_card.model';
 
 export class TradeController {
   // Create a trade offer
@@ -16,12 +16,11 @@ export class TradeController {
         return;
       }
 
-      const cardRepository = getRepository(Card);
+      const dealtCardRepository = getRepository(DealtCard);
       const tradeRepository = getRepository(Trade);
-      const userRepository = getRepository(User);
 
       // Check if the offered card belongs to the user
-      const offeredCard = await cardRepository.findOne({
+      const offeredCard = await dealtCardRepository.findOne({
         where: { id: offeredCardId, owner: { id: req.user?.id } },
       });
 
@@ -35,7 +34,7 @@ export class TradeController {
 
       if (requestedCardId) {
         // This is a direct trade offer
-        requestedCard = await cardRepository.findOne({
+        requestedCard = await dealtCardRepository.findOne({
           where: { id: requestedCardId },
           relations: ['owner'],
         });
@@ -50,8 +49,8 @@ export class TradeController {
         // Check if the cards are already in a pending trade
         const existingTrade = await tradeRepository.findOne({
           where: [
-            { offeredCard: { id: offeredCardId }, status: 'pending' },
-            { requestedCard: { id: requestedCardId }, status: 'pending' },
+            { offeredCard: { owner: offeredCardId }, status: 'pending' },
+            { requestedCard: { owner: requestedCardId }, status: 'pending' },
           ],
         });
 
@@ -88,7 +87,7 @@ export class TradeController {
       const { tradeId } = req.body;
 
       const tradeRepository = getRepository(Trade);
-      const cardRepository = getRepository(Card);
+      const dealtCardRepository = getRepository(DealtCard);
       const userRepository = getRepository(User);
 
       // Get the trade
@@ -112,7 +111,7 @@ export class TradeController {
       if (trade.requestedCard) {
         // Direct card-for-card trade
         // Check if the requested card still belongs to the user
-        const requestedCard = await cardRepository.findOne({
+        const requestedCard = await dealtCardRepository.findOne({
           where: { id: trade.requestedCard.id, owner: { id: req.user?.id } },
         });
 
@@ -123,10 +122,10 @@ export class TradeController {
 
         // Swap card ownership
         requestedCard.owner = trade.offeredBy;
-        trade.offeredCard.owner = req.user;
+        trade.offeredCard.owner = req.user!;
 
-        await cardRepository.save(requestedCard);
-        await cardRepository.save(trade.offeredCard);
+        await dealtCardRepository.save(requestedCard);
+        await dealtCardRepository.save(trade.offeredCard);
       } else {
         // Card for coins trade
         if (!req.user) {
@@ -154,7 +153,7 @@ export class TradeController {
 
         await userRepository.save(buyer);
         await userRepository.save(trade.offeredBy);
-        await cardRepository.save(trade.offeredCard);
+        await dealtCardRepository.save(trade.offeredCard);
       }
 
       // Mark the trade as completed

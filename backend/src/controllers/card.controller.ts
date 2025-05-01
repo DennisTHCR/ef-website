@@ -1,18 +1,18 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { Card } from '../models/card.model';
 import { DealtCard } from '../models/dealt_card.model'
 import { User } from '../models/user.model';
 import { Season } from '../models/season.model';
 import { Pack } from '../models/pack.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { Card } from '../models/card.model';
 
 export class CardController {
   // Get all cards for the current user
   async getUserCards(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const cardRepository = getRepository(Card);
-      const cards = await cardRepository.find({
+      const dealtCardRepository = getRepository(DealtCard);
+      const cards = await dealtCardRepository.find({
         where: { owner: { id: req.user?.id } },
         relations: ['season'],
       });
@@ -28,8 +28,8 @@ export class CardController {
   async getCardById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const cardRepository = getRepository(Card);
-      const card = await cardRepository.findOne({
+      const dealtCardRepository = getRepository(DealtCard);
+      const card = await dealtCardRepository.findOne({
         where: { id },
         relations: ['season', 'owner'],
       });
@@ -98,7 +98,7 @@ export class CardController {
         const card = cards[Math.floor(Math.random() * cards.length)];
 
         await dealtCardRepository.insert({
-          type: card.id,
+          type: card.type,
           owner: pack.owner,
         });
         drawnCards.push(card);
@@ -188,10 +188,10 @@ export class CardController {
         return;
       }
 
-      const cardRepository = getRepository(Card);
+      const dealtCardRepository = getRepository(DealtCard);
 
       // Get the card to upgrade
-      const card = await cardRepository.findOne({
+      const card = await dealtCardRepository.findOne({
         where: { id: cardId, owner: { id: req.user?.id } },
       });
 
@@ -201,7 +201,7 @@ export class CardController {
       }
 
       // Get all sacrifice cards
-      const sacrificeCards = await cardRepository.find({
+      const sacrificeCards = await dealtCardRepository.find({
         where: sacrificeCardIds.map(id => ({ id, owner: { id: req.user?.id } })),
       });
 
@@ -218,7 +218,7 @@ export class CardController {
 
       // Ensure all sacrifice cards are of the same teacher and subject
       for (const sacrificeCard of sacrificeCards) {
-        if (sacrificeCard.teacherName !== card.teacherName || sacrificeCard.subject !== card.subject) {
+        if (sacrificeCard.type !== card.type) {
           res.status(400).json({
             message: 'All sacrifice cards must have the same teacher and subject as the card being upgraded'
           });
@@ -228,10 +228,10 @@ export class CardController {
 
       // Update the card level
       card.level += sacrificeCards.length;
-      await cardRepository.save(card);
+      await dealtCardRepository.save(card);
 
       // Remove the sacrifice cards
-      await cardRepository.remove(sacrificeCards);
+      await dealtCardRepository.remove(sacrificeCards);
 
       res.status(200).json({
         message: 'Card upgraded successfully',
@@ -248,11 +248,11 @@ export class CardController {
     try {
       const { cardId } = req.body;
 
-      const cardRepository = getRepository(Card);
+      const dealtCardRepository = getRepository(DealtCard);
       const userRepository = getRepository(User);
 
       // Get the card
-      const card = await cardRepository.findOne({
+      const card = await dealtCardRepository.findOne({
         where: { id: cardId, owner: { id: req.user?.id } },
       });
 
@@ -264,8 +264,7 @@ export class CardController {
       // Calculate the sell value based on level and rating
       const baseValue = 50;
       const levelBonus = (card.level - 1) * 25;
-      const ratingBonus = Math.max(0, (card.rating - 1000) / 10);
-      const sellValue = Math.floor(baseValue + levelBonus + ratingBonus);
+      const sellValue = Math.floor(baseValue + levelBonus);
 
       // Update user coins
       if (!req.user) {
@@ -286,7 +285,7 @@ export class CardController {
       await userRepository.save(user);
 
       // Remove the card
-      await cardRepository.remove(card);
+      await dealtCardRepository.remove(card);
 
       res.status(200).json({
         message: 'Card sold successfully',

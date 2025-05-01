@@ -21,8 +21,8 @@ export class Card {
   @Column({ default: 1 })
   level: number;
 
-  @ManyToOne(() => Season, season => season.id)
-  seasonId: number;
+  @ManyToOne(() => Season)
+  season: Season;
 
   @Column({ default: 0 })
   wins: number;

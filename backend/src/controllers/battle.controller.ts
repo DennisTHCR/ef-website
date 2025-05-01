@@ -5,6 +5,7 @@ import { Card } from '../models/card.model';
 import { User } from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { EloService } from '../services/elo.service';
+import { DealtCard } from '../models/dealt_card.model';
 
 export class BattleController {
   private eloService = new EloService();
@@ -61,12 +62,13 @@ export class BattleController {
         return;
       }
 
+      const dealtCardRepository = getRepository(DealtCard);
       const cardRepository = getRepository(Card);
       const battleRepository = getRepository(Battle);
 
       // Get the cards
-      const card1 = await cardRepository.findOne({ where: { id: card1Id } });
-      const card2 = await cardRepository.findOne({ where: { id: card2Id } });
+      const card1 = await dealtCardRepository.findOne({ where: { id: card1Id } });
+      const card2 = await dealtCardRepository.findOne({ where: { id: card2Id } });
 
       if (!card1 || !card2) {
         res.status(404).json({ message: 'One or both cards not found' });
@@ -84,8 +86,8 @@ export class BattleController {
       await battleRepository.save(battle);
 
       // Update card ratings
-      const winner = winnerId === card1Id ? card1 : card2;
-      const loser = winnerId === card1Id ? card2 : card1;
+      const winner = (await cardRepository.findOne({ where: { type: winnerId === card1Id ? card1.type : card2.type } }))!;
+      const loser = (await cardRepository.findOne({ where: { type: winnerId === card1Id ? card2.type : card1.type } }))!;
 
       const { winnerNewRating, loserNewRating } = this.eloService.calculateNewRatings(
         winner.rating,
@@ -95,12 +97,12 @@ export class BattleController {
       // Update winner stats
       winner.rating = winnerNewRating;
       winner.wins += 1;
-      await cardRepository.save(winner);
+      await dealtCardRepository.save(winner);
 
       // Update loser stats
       loser.rating = loserNewRating;
       loser.losses += 1;
-      await cardRepository.save(loser);
+      await dealtCardRepository.save(loser);
 
       // Give the voter some coins as a reward
       if (req.user) {
