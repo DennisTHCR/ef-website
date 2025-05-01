@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
 import { User } from './user.model';
-import { Card } from './card.model';
+import { DealtCard } from './dealt_card.model';
 
 @Entity('trades')
 export class Trade {
@@ -13,11 +13,11 @@ export class Trade {
   @ManyToOne(() => User)
   offeredTo: User | null;
 
-  @ManyToOne(() => Card)
-  offeredCard: Card;
+  @ManyToOne(() => DealtCard)
+  offeredCard: DealtCard;
 
-  @ManyToOne(() => Card)
-  requestedCard: Card | null;
+  @ManyToOne(() => DealtCard)
+  requestedCard: DealtCard | null;
 
   @Column({ default: 0 })
   askingPrice: number;
