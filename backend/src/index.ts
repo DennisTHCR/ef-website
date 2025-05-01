@@ -7,6 +7,7 @@ import cardRoutes from './routes/card.routes';
 import battleRoutes from './routes/battle.routes';
 import trainerRoutes from './routes/trainer.routes';
 import tradeRoutes from './routes/trade.routes';
+import adminRoutes from './routes/admin.routes';
 import { errorMiddleware } from './middleware/error.middleware';
 import { dbConfig } from './config/database';
 

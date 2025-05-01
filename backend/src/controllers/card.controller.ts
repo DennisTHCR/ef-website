@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 import { Card } from '../models/card.model';
+import { DealtCard } from '../models/dealt_card.model'
 import { User } from '../models/user.model';
 import { Season } from '../models/season.model';
-import { Teacher } from '../models/teacher.model';
 import { Pack } from '../models/pack.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 
@@ -50,10 +50,9 @@ export class CardController {
   async openPack(req: AuthRequest, res: Response): Promise<void> {
     try {
       const packRepository = getRepository(Pack);
-      const userRepository = getRepository(User);
       const cardRepository = getRepository(Card);
       const seasonRepository = getRepository(Season);
-      const teacherRepository = getRepository(Teacher);
+      const dealtCardRepository = getRepository(DealtCard);
 
       // Find an unopened pack owned by the user
       const pack = await packRepository.findOne({
@@ -79,45 +78,30 @@ export class CardController {
         return;
       }
 
-      // Get all teachers with their subjects and quotes
-      const teachers = await teacherRepository.find({
-        relations: ['quotes', 'subjects'],
+      // Get all cards of the current season
+      const cards = await cardRepository.find({
+        where: {
+          season: season
+        }
       });
 
-      if (teachers.length === 0) {
-        res.status(404).json({ message: 'No teachers found in database' });
+      if (cards.length === 0) {
+        res.status(404).json({ message: 'No cards found in database' });
         return;
       }
 
-      // Generate 3 random cards
-      const newCards = [];
+      // Select 3 random cards
+      const drawnCards = [];
 
       for (let i = 0; i < 3; i++) {
-        // Select a random teacher
-        const randomTeacher = teachers[Math.floor(Math.random() * teachers.length)];
+        // Select a random card
+        const card = cards[Math.floor(Math.random() * cards.length)];
 
-        // Select a random subject from the teacher's subjects
-        const randomSubject = randomTeacher.subjects.length > 0
-          ? randomTeacher.subjects[Math.floor(Math.random() * randomTeacher.subjects.length)]
-          : null;
-
-        // Select a random quote from the teacher's quotes
-        const randomQuote = randomTeacher.quotes.length > 0
-          ? randomTeacher.quotes[Math.floor(Math.random() * randomTeacher.quotes.length)]
-          : null;
-
-        // Create and save a new card
-        const card = cardRepository.create({
-          teacherName: randomTeacher.name,
-          subject: randomSubject ? randomSubject.name : 'General',
-          quote: randomQuote ? randomQuote.text : 'No quote available',
-          owner: req.user,
-          season,
-          teacher: randomTeacher,
+        await dealtCardRepository.insert({
+          type: card.id,
+          owner: pack.owner,
         });
-
-        await cardRepository.save(card);
-        newCards.push(card);
+        drawnCards.push(card);
       }
 
       // Mark the pack as opened
@@ -126,7 +110,7 @@ export class CardController {
 
       res.status(200).json({
         message: 'Pack opened successfully',
-        cards: newCards
+        cards: drawnCards
       });
     } catch (error) {
       console.error('Open pack error:', error);

@@ -10,7 +10,7 @@ export class Teacher {
   quotes: Quote[];
 
   @Column()
-  name: String;
+  name: string;
 
   @ManyToMany(() => Subject)
   @JoinTable({
