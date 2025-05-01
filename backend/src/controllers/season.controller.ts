@@ -75,4 +75,17 @@ export class SeasonController {
       res.status(500).json({ message: 'Server error' });
     }
   }
+
+  async startNewSeason(req: Request, res: Response): Promise<void> {
+    try {
+      const seasonRepository = getRepository(Season);
+      const { name } = req.params;
+      const season = new Season();
+      season.name = name;
+      seasonRepository.save(season);
+    } catch (error) {
+      console.error('Create new season error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
 }
