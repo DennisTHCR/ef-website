@@ -35,9 +35,35 @@ This document provides details about the Teacher Card Game API endpoints, reques
   - [Get Trade Offers](#get-trade-offers)
   - [Get User Trade History](#get-user-trade-history)
 - [Admin Endpoints](#admin-endpoints)
-  - [Create Teacher](#create-teacher)
-  - [Add Quote to Teacher](#add-quote-to-teacher)
-  - [Add Subject to Teacher](#add-subject-to-teacher)
+  - [Teacher Management](#teacher-management)
+    - [Create Teacher](#create-teacher)
+    - [Get All Teachers](#get-all-teachers)
+    - [Get Teacher by ID](#get-teacher-by-id)
+    - [Update Teacher](#update-teacher)
+    - [Delete Teacher](#delete-teacher)
+  - [Quote Management](#quote-management)
+    - [Add Quote to Teacher](#add-quote-to-teacher)
+    - [Get All Quotes](#get-all-quotes)
+    - [Get Quote by ID](#get-quote-by-id)
+    - [Update Quote](#update-quote)
+    - [Delete Quote](#delete-quote)
+  - [Subject Management](#subject-management)
+    - [Create Subject](#create-subject)
+    - [Get All Subjects](#get-all-subjects)
+    - [Get Subject by ID](#get-subject-by-id)
+    - [Update Subject](#update-subject)
+    - [Delete Subject](#delete-subject)
+  - [Teacher-Subject Relationship](#teacher-subject-relationship)
+    - [Add Subject to Teacher](#add-subject-to-teacher)
+    - [Remove Subject from Teacher](#remove-subject-from-teacher)
+  - [Season Management](#season-management)
+    - [Create Season](#create-season)
+    - [Update Season](#update-season)
+    - [Delete Season](#delete-season)
+  - [Card Generation](#card-generation)
+    - [Generate Cards for Season](#generate-cards-for-season)
+    - [Get Cards by Season ID](#get-cards-by-season-id)
+    - [Delete Card](#delete-card)
 
 ## Base URL
 
@@ -864,7 +890,9 @@ Retrieves the trade history for the authenticated user.
 
 > **Note**: Admin endpoints require an admin password to be included in the request headers: `admin-password: alanleyel`
 
-### Create Teacher
+### Teacher Management
+
+#### Create Teacher
 
 Creates a new teacher.
 
@@ -899,7 +927,123 @@ Creates a new teacher.
   - `401`: Unauthorized
   - `500`: Server error
 
-### Add Quote to Teacher
+#### Get All Teachers
+
+Retrieves all teachers.
+
+- **URL**: `/admin/teachers`
+- **Method**: `GET`
+- **Authentication**: Admin password required
+- **Success Response (200)**:
+  ```json
+  {
+    "teachers": [
+      {
+        "id": "uuid",
+        "name": "string",
+        "subjects": [
+          {
+            "id": "uuid",
+            "name": "string"
+          }
+        ]
+      }
+    ]
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `500`: Server error
+
+#### Get Teacher by ID
+
+Retrieves a teacher by ID.
+
+- **URL**: `/admin/teachers/:id`
+- **Method**: `GET`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Teacher ID
+- **Success Response (200)**:
+  ```json
+  {
+    "teacher": {
+      "id": "uuid",
+      "name": "string",
+      "subjects": [
+        {
+          "id": "uuid",
+          "name": "string"
+        }
+      ],
+      "quotes": [
+        {
+          "id": "uuid",
+          "text": "string"
+        }
+      ]
+    }
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Teacher not found
+  - `500`: Server error
+
+#### Update Teacher
+
+Updates an existing teacher.
+
+- **URL**: `/admin/teachers/:id`
+- **Method**: `PUT`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Teacher ID
+- **Request Body**:
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Teacher updated successfully",
+    "teacher": {
+      "id": "uuid",
+      "name": "string"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: Name is required
+  - `401`: Unauthorized
+  - `404`: Teacher not found
+  - `500`: Server error
+
+#### Delete Teacher
+
+Deletes a teacher.
+
+- **URL**: `/admin/teachers/:id`
+- **Method**: `DELETE`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Teacher ID
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Teacher deleted successfully"
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Teacher not found
+  - `500`: Server error
+
+### Quote Management
+
+#### Add Quote to Teacher
 
 Adds a quote to an existing teacher.
 
@@ -934,7 +1078,245 @@ Adds a quote to an existing teacher.
   - `404`: Teacher not found
   - `500`: Server error
 
-### Add Subject to Teacher
+#### Get All Quotes
+
+Retrieves all quotes.
+
+- **URL**: `/admin/quotes`
+- **Method**: `GET`
+- **Authentication**: Admin password required
+- **Success Response (200)**:
+  ```json
+  {
+    "quotes": [
+      {
+        "id": "uuid",
+        "text": "string",
+        "teacher": {
+          "id": "uuid",
+          "name": "string"
+        }
+      }
+    ]
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `500`: Server error
+
+#### Get Quote by ID
+
+Retrieves a quote by ID.
+
+- **URL**: `/admin/quotes/:id`
+- **Method**: `GET`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Quote ID
+- **Success Response (200)**:
+  ```json
+  {
+    "quote": {
+      "id": "uuid",
+      "text": "string",
+      "teacher": {
+        "id": "uuid",
+        "name": "string"
+      }
+    }
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Quote not found
+  - `500`: Server error
+
+#### Update Quote
+
+Updates an existing quote.
+
+- **URL**: `/admin/quotes/:id`
+- **Method**: `PUT`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Quote ID
+- **Request Body**:
+  ```json
+  {
+    "text": "string"
+  }
+  ```
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Quote updated successfully",
+    "quote": {
+      "id": "uuid",
+      "text": "string"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: Text is required
+  - `401`: Unauthorized
+  - `404`: Quote not found
+  - `500`: Server error
+
+#### Delete Quote
+
+Deletes a quote.
+
+- **URL**: `/admin/quotes/:id`
+- **Method**: `DELETE`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Quote ID
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Quote deleted successfully"
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Quote not found
+  - `500`: Server error
+
+### Subject Management
+
+#### Create Subject
+
+Creates a new subject.
+
+- **URL**: `/admin/subjects`
+- **Method**: `POST`
+- **Authentication**: Admin password required
+- **Request Body**:
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+- **Success Response (201)**:
+  ```json
+  {
+    "message": "Subject created successfully",
+    "subject": {
+      "id": "uuid",
+      "name": "string"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: Subject name is required
+  - `401`: Unauthorized
+  - `500`: Server error
+
+#### Get All Subjects
+
+Retrieves all subjects.
+
+- **URL**: `/admin/subjects`
+- **Method**: `GET`
+- **Authentication**: Admin password required
+- **Success Response (200)**:
+  ```json
+  {
+    "subjects": [
+      {
+        "id": "uuid",
+        "name": "string"
+      }
+    ]
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `500`: Server error
+
+#### Get Subject by ID
+
+Retrieves details about a specific subject.
+
+- **URL**: `/admin/subjects/:id`
+- **Method**: `GET`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Subject ID
+- **Success Response (200)**:
+  ```json
+  {
+    "subject": {
+      "id": "uuid",
+      "name": "string",
+      "teachers": [
+        {
+          "id": "uuid",
+          "name": "string"
+        }
+      ]
+    }
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Subject not found
+  - `500`: Server error
+
+#### Update Subject
+
+Updates an existing subject.
+
+- **URL**: `/admin/subjects/:id`
+- **Method**: `PUT`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Subject ID
+- **Request Body**:
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Subject updated successfully",
+    "subject": {
+      "id": "uuid",
+      "name": "string"
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: Subject name is required
+  - `401`: Unauthorized
+  - `404`: Subject not found
+  - `500`: Server error
+
+#### Delete Subject
+
+Deletes a subject.
+
+- **URL**: `/admin/subjects/:id`
+- **Method**: `DELETE`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Subject ID
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Subject deleted successfully"
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Subject not found
+  - `500`: Server error
+
+### Teacher-Subject Relationship
+
+#### Add Subject to Teacher
 
 Adds subjects to an existing teacher.
 
@@ -969,4 +1351,241 @@ Adds subjects to an existing teacher.
   - `400`: Subject IDs array is required
   - `401`: Unauthorized
   - `404`: Teacher not found / None of the provided subject IDs were found
+  - `500`: Server error
+
+#### Remove Subject from Teacher
+
+Removes a subject from a teacher.
+
+- **URL**: `/admin/teachers/:teacherId/subjects/:subjectId`
+- **Method**: `DELETE`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `teacherId`: Teacher ID
+  - `subjectId`: Subject ID
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Subject removed from teacher successfully",
+    "teacher": {
+      "id": "uuid",
+      "name": "string",
+      "subjects": [
+        {
+          "id": "uuid",
+          "name": "string"
+        }
+      ]
+    }
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Teacher not found / Subject not found / Subject not associated with teacher
+  - `500`: Server error
+
+### Season Management
+
+#### Create Season
+
+Creates a new season.
+
+- **URL**: `/admin/seasons`
+- **Method**: `POST`
+- **Authentication**: Admin password required
+- **Request Body**:
+  ```json
+  {
+    "name": "string",
+    "startDate": "ISO date string",
+    "endDate": "ISO date string",
+    "isActive": boolean
+  }
+  ```
+- **Success Response (201)**:
+  ```json
+  {
+    "message": "Season created successfully",
+    "season": {
+      "id": "uuid",
+      "name": "string",
+      "startDate": "ISO date string",
+      "endDate": "ISO date string",
+      "isActive": boolean
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: Season name, start date, and end date are required / End date must be after start date
+  - `401`: Unauthorized
+  - `500`: Server error
+
+#### Update Season
+
+Updates an existing season.
+
+- **URL**: `/admin/seasons/:id`
+- **Method**: `PUT`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Season ID
+- **Request Body**:
+  ```json
+  {
+    "name": "string",
+    "startDate": "ISO date string",
+    "endDate": "ISO date string",
+    "isActive": boolean
+  }
+  ```
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Season updated successfully",
+    "season": {
+      "id": "uuid",
+      "name": "string",
+      "startDate": "ISO date string",
+      "endDate": "ISO date string",
+      "isActive": boolean
+    }
+  }
+  ```
+- **Error Responses**:
+  - `400`: End date must be after start date
+  - `401`: Unauthorized
+  - `404`: Season not found
+  - `500`: Server error
+
+#### Delete Season
+
+Deletes a season.
+
+- **URL**: `/admin/seasons/:id`
+- **Method**: `DELETE`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Season ID
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Season deleted successfully"
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Season not found
+  - `500`: Server error
+
+### Card Generation
+
+#### Generate Cards for Season
+
+Generates cards for a specific season.
+
+- **URL**: `/admin/seasons/:seasonId/generate-cards`
+- **Method**: `POST`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `seasonId`: Season ID
+- **Request Body**:
+  ```json
+  {
+    "amount": 10 // Optional: Number of cards to generate
+  }
+  ```
+- **Success Response (201)**:
+  ```json
+  {
+    "message": "Cards generated successfully",
+    "cards": [
+      {
+        "id": "uuid",
+        "type": "string",
+        "level": 1,
+        "teacher": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "subject": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "quote": {
+          "id": "uuid",
+          "text": "string"
+        },
+        "season": {
+          "id": "uuid",
+          "name": "string"
+        }
+      }
+    ]
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Season not found
+  - `500`: Server error
+
+#### Get Cards by Season ID
+
+Retrieves all cards for a specific season.
+
+- **URL**: `/admin/seasons/:seasonId/cards`
+- **Method**: `GET`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `seasonId`: Season ID
+- **Success Response (200)**:
+  ```json
+  {
+    "cards": [
+      {
+        "id": "uuid",
+        "type": "string",
+        "level": 1,
+        "teacher": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "subject": {
+          "id": "uuid",
+          "name": "string"
+        },
+        "quote": {
+          "id": "uuid",
+          "text": "string"
+        },
+        "season": {
+          "id": "uuid",
+          "name": "string"
+        }
+      }
+    ]
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Season not found
+  - `500`: Server error
+
+#### Delete Card
+
+Deletes a card.
+
+- **URL**: `/admin/cards/:id`
+- **Method**: `DELETE`
+- **Authentication**: Admin password required
+- **URL Parameters**:
+  - `id`: Card ID
+- **Success Response (200)**:
+  ```json
+  {
+    "message": "Card deleted successfully"
+  }
+  ```
+- **Error Responses**:
+  - `401`: Unauthorized
+  - `404`: Card not found
   - `500`: Server error
