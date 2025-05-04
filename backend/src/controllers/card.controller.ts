@@ -14,7 +14,6 @@ export class CardController {
       const dealtCardRepository = getRepository(DealtCard);
       const cards = await dealtCardRepository.find({
         where: { owner: { id: req.user?.id } },
-        relations: ['season'],
       });
 
       res.status(200).json({ cards });
@@ -31,7 +30,7 @@ export class CardController {
       const dealtCardRepository = getRepository(DealtCard);
       const card = await dealtCardRepository.findOne({
         where: { id },
-        relations: ['season', 'owner'],
+        relations: ['owner'],
       });
 
       if (!card) {
@@ -95,7 +94,7 @@ export class CardController {
 
       for (let i = 0; i < 3; i++) {
         // Select a random card
-        const card = cards[Math.floor(Math.random() * cards.length)];
+        const card = cards[Math.round(Math.random() * (cards.length - 1))];
 
         await dealtCardRepository.insert({
           type: card.type,
