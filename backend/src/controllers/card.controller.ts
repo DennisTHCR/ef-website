@@ -28,8 +28,8 @@ export class CardController {
     try {
       const { type } = req.params;
       const cardRepository = getRepository(Card);
-      where: { type }
       const card = await cardRepository.findOne({
+        where: { type }
       });
       res.status(200).json({ card });
     } catch (error) {
