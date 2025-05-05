@@ -23,6 +23,20 @@ export class CardController {
     }
   }
 
+  // Get information about a card by Type middleware
+  async getCardByType(req: Request, res: Response): Promise<void> {
+    try {
+      const { type } = req.params;
+      const cardRepository = getRepository(Card);
+      const cards = await cardRepository.findOne({
+        where: { type }
+      });
+    } catch (error) {
+      console.error('Get card by Type error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+
   // Get a specific card by ID
   async getCardById(req: Request, res: Response): Promise<void> {
     try {
