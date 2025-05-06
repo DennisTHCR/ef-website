@@ -228,6 +228,35 @@ Retrieves all cards owned by the authenticated user.
   - `401`: Authentication required
   - `500`: Server error
 
+### Get Card by Type
+
+Retrieves details about a specific card type.
+
+- URL: `/cards/type/:type`
+- Method: `GET`
+- Authentication: None
+- URL Parameters:
+  - `type`: Card Type
+- **Success Response (200)**:
+```json
+  {
+    "card": {
+        "type": "string",
+        "teacherName": "string",
+        "subject": "string",
+        "quote": "string",
+        "rating": 1000,
+        "level": 1,
+        "wins": 0,
+        "losses": 0
+    }
+  }
+```
+
+- **Error Responses**:
+  - `404`: Card not found
+  - `500`: Server error
+
 ### Get Card by ID
 
 Retrieves details about a specific card.
