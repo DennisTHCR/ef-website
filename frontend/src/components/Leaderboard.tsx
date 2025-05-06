@@ -10,6 +10,7 @@ const allPlayers = [
   'QuizMaster',
   'SpeedyJoe',
   'LearnerX',
+  
 ];
 
 export default function Leaderboard() {
