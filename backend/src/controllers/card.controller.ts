@@ -29,12 +29,14 @@ export class CardController {
       const { type } = req.params;
       const cardRepository = getRepository(Card);
       const card = await cardRepository.findOne({
-        if(!card) {
-          res.status(404).json({ message: 'Card not found' });
-          return;
-        }
         where: { type }
       });
+
+      if (!card) {
+        res.status(404).json({ message: 'Card not found' });
+        return;
+      }
+
       res.status(200).json({ card });
     } catch (error) {
       console.error('Get card by Type error:', error);
