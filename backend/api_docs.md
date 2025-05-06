@@ -187,6 +187,13 @@ Retrieves the authenticated user's profile and card collection.
           "level": 1
         }
       ],
+      "packs": [
+        {
+        "id": "uuid",
+        "season": "string",
+        "opened": "bool"
+        }
+      ]
       "lastPackClaim": "ISO date string"
     }
   }

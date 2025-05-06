@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { Pack } from '../models/pack.model';
 
 export class AuthController {
   async register(req: Request, res: Response): Promise<void> {
@@ -100,10 +101,14 @@ export class AuthController {
   async getProfile(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userRepository = getRepository(User);
+      const packRepository = getRepository(Pack);
       const user = await userRepository.findOne({
         where: { id: req.user?.id },
         relations: ['cards'],
       });
+      const packs = await packRepository.find({
+        where: { owner: user }
+      })
 
       if (!user) {
         res.status(404).json({ message: 'User not found' });
@@ -117,7 +122,8 @@ export class AuthController {
           coins: user.coins,
           rating: user.rating,
           cards: user.cards,
-          lastPackClaim: user.lastPackClaim
+          lastPackClaim: user.lastPackClaim,
+          packs: packs,
         },
       });
     } catch (error) {
