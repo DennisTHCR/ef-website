@@ -113,7 +113,7 @@ export class AuthController {
       }
 
       const packs = await packRepository.find({
-        where: { owner: user! }
+        where: { owner: { id: user.id } }
       });
 
       res.status(200).json({
