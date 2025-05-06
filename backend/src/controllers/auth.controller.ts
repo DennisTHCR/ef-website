@@ -106,14 +106,15 @@ export class AuthController {
         where: { id: req.user?.id },
         relations: ['cards'],
       });
-      const packs = await packRepository.find({
-        where: { owner: user }
-      })
 
       if (!user) {
         res.status(404).json({ message: 'User not found' });
         return;
       }
+
+      const packs = await packRepository.find({
+        where: { owner: user! }
+      })
 
       res.status(200).json({
         user: {
