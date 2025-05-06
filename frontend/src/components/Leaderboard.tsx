@@ -22,7 +22,7 @@ export default function Leaderboard() {
   }, [searchTerm]);
 
   return (
-    <aside className="w-75 bg-white p-4 rounded shadow">
+    <aside className="w-75 bg-white p-4 rounded shadow h-full">
       <h3 className="font-semibold mb-2">Leaderboard</h3>
       <input
         type="text"
