@@ -14,6 +14,45 @@ interface TeacherCardProps {
   onHeightChange?: (height: number) => void
 }
 
+function teacherNameToWebString(teacherName: string): string {
+  if (!teacherName || typeof teacherName !== 'string') {
+    return '';
+  }
+
+  // Convert to lowercase
+  let webString = teacherName.toLowerCase();
+
+  // Replace umlauts and other diacritical marks
+  const charMap: Record<string, string> = {
+    'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss',
+    'á': 'a', 'à': 'a', 'â': 'a', 'ã': 'a', 'å': 'a',
+    'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+    'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
+    'ó': 'o', 'ò': 'o', 'ô': 'o', 'õ': 'o',
+    'ú': 'u', 'ù': 'u', 'û': 'u',
+    'ñ': 'n', 'ç': 'c'
+  };
+
+  // Replace diacritical marks
+  for (const [key, value] of Object.entries(charMap)) {
+    webString = webString.replace(new RegExp(key, 'g'), value);
+  }
+
+  // Remove all remaining non-alphanumeric characters except hyphens and replace spaces with hyphens
+  webString = webString.replace(/\s+/g, '-');
+
+  // Remove any remaining non-alphanumeric characters (except hyphens)
+  webString = webString.replace(/[^a-z0-9-]/g, '');
+
+  // Remove multiple consecutive hyphens
+  webString = webString.replace(/-+/g, '-');
+
+  // Remove leading and trailing hyphens
+  webString = webString.replace(/^-+|-+$/g, '');
+
+  return webString;
+}
+
 export default function TeacherCard({
   id,
   name,
@@ -67,7 +106,9 @@ export default function TeacherCard({
             <span className="font-pixel text-sm">{subject}</span>
           </div>
         )}
-        <div className="bg-[#d9d9d9] w-full h-36 mb-3"></div>
+        <div className="bg-[#d9d9d9] w-full h-36 mb-3 overflow-hidden">
+          <img src={`https://kswofficial.fr/images/${teacherNameToWebString(name)}.jpg`} />
+        </div>
         <p className="text-lg text-center font-bold font-pixel">{quote}</p>
       </div>
     </div>

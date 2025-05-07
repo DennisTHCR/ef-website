@@ -1,5 +1,5 @@
 // Base URL for all API requests
-const API_BASE_URL = "http://kswofficial.fr:3000/api"
+const API_BASE_URL = "https://api.kswofficial.fr/api"
 
 // Helper function for making API requests
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {

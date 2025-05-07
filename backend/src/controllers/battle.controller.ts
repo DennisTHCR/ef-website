@@ -5,18 +5,25 @@ import { Card } from '../models/card.model';
 import { User } from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { EloService } from '../services/elo.service';
+import { Season } from '../models/season.model';
 
 export class BattleController {
   // Get battle cards for voting
   async getBattleCards(req: AuthRequest, res: Response): Promise<void> {
     try {
       const cardRepository = getRepository(Card);
+      const seasonRepository = getRepository(Season);
+
+      const currentSeason = await seasonRepository.findOne({
+        where: { isActive: true }
+      });
 
       // Find two random cards with similar ratings
       // Ideally, we'd implement a more sophisticated matching algorithm
       const cards = await cardRepository.find({
         order: { rating: 'ASC' },
         take: 100, // Take a pool of cards to choose from
+        where: { season: { id: currentSeason!.id } }
       });
 
       if (cards.length < 2) {
