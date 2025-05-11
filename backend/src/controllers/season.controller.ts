@@ -63,7 +63,6 @@ export class SeasonController {
       // Get top rated cards for the season
       const topCards = await cardRepository.find({
         where: { season: { id: Number(seasonId) } },
-        relations: ['owner'],
         order: { rating: 'DESC' },
         take: 100,
       });
@@ -120,6 +119,7 @@ export class SeasonController {
             if (teacher.quotes && teacher.quotes.length > 0) {
               const randomIndex = Math.floor(Math.random() * teacher.quotes.length);
               randomQuote = teacher.quotes[randomIndex];
+              teacher.quotes = teacher.quotes.filter((_, index) => index != randomIndex);
             }
 
             let card = new Card();

@@ -107,7 +107,7 @@ export default function TeacherCard({
           </div>
         )}
         <div className="bg-[#d9d9d9] w-full h-36 mb-3 overflow-hidden">
-          <img src={`https://kswofficial.fr/images/${teacherNameToWebString(name)}.jpg`} />
+          <img src={`https://cdn.kswofficial.fr/quotemon_images/${teacherNameToWebString(name)}.jpg`} />
         </div>
         <p className="text-lg text-center font-bold font-pixel">{quote}</p>
       </div>

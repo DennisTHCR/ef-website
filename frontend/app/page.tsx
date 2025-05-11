@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Header from "@/components/header"
 import TeacherCard from "@/components/teacher-card"
 import Leaderboard from "@/components/leaderboard"
-import { getBattleCards, voteOnBattle } from "@/utils/api-service"
+import { getBattleCards, getTopRankedCards, voteOnBattle } from "@/utils/api-service"
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "sonner"
 
@@ -16,6 +16,12 @@ interface BattleCard {
   quote: string
 }
 
+interface LeaderboardCard {
+  type: string
+  teacherName: string
+  subject: string
+}
+
 export default function Home() {
   const [cards, setCards] = useState<{ card1: BattleCard | null; card2: BattleCard | null }>({
     card1: null,
@@ -23,6 +29,8 @@ export default function Home() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isVoting, setIsVoting] = useState(false)
+  const [topCards, setTopCards] = useState<LeaderboardCard[]>()
+  const [isLeaderLoading, setIsLeaderLoading] = useState(true)
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
   const [cardHeights, setCardHeights] = useState<{ [key: string]: number }>({})
@@ -53,6 +61,14 @@ export default function Home() {
   async function fetchBattleCards() {
     setIsLoading(true)
     try {
+      const data = await getTopRankedCards(10)
+      setTopCards(data.leaderboard || [])
+      setIsLeaderLoading(false)
+    } catch (error) {
+      console.error("Failed to fetch top cards:", error)
+    }
+
+    try {
       const data = await getBattleCards()
       setCards({
         card1: data.card1,
@@ -76,7 +92,6 @@ export default function Home() {
     try {
       await voteOnBattle(cards.card1.type, cards.card2.type, winnerId)
       toast.success("Vote recorded successfully!")
-
       // Fetch new cards for the next battle
       fetchBattleCards()
     } catch (error) {
@@ -100,7 +115,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fffcb2] flex flex-col">
+    <main className="min-h-screen bg-[#fffdd0] flex flex-col">
       <Header />
 
       <div className="flex h-full min-h-full flex-col md:flex-row flex-1">
@@ -138,7 +153,7 @@ export default function Home() {
 
         {/* Leaderboard Sidebar - only visible on very wide screens */}
         <div className="hidden 2xl:block border-l-2 border-black w-[32rem]">
-          <Leaderboard />
+          <Leaderboard topCards={topCards || []} isLoading={isLeaderLoading} />
         </div>
       </div>
     </main>

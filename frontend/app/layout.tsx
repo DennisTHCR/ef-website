@@ -5,7 +5,6 @@ import { Toaster } from "sonner"
 import { AuthProvider } from "@/contexts/auth-context"
 import "./globals.css"
 
-// Properly import the Press Start 2P font
 const pixelFont = Press_Start_2P({
   weight: "400",
   subsets: ["latin"],
@@ -14,9 +13,11 @@ const pixelFont = Press_Start_2P({
 })
 
 export const metadata: Metadata = {
-  title: "Teachemone",
-  description: "A retro pixel-style teacher rating platform",
-    generator: 'v0.dev'
+  title: "Quotemon",
+  description: "Retro Pixel-Style Lehrerzitat Bewertungsplatform",
+  icons: {
+    icon: '/favicon.png',
+  }
 }
 
 export default function RootLayout({
@@ -26,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${pixelFont.variable} bg-[#fffcb2]`}>
+      <body className={`${pixelFont.variable} bg-[#fffdd0]`}>
         <AuthProvider>
           {children}
           <Toaster

@@ -31,7 +31,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fffcb2] flex flex-col items-center justify-center p-4">
+    <main className="min-h-screen bg-[#fffdd0] flex flex-col items-center justify-center p-4">
       <div className="bg-[#f7e8d4] rounded-3xl p-6 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-full max-w-md">
         <h1 className="text-4xl font-bold font-pixel text-center mb-6">TEACHEMONE</h1>
         <h2 className="text-2xl font-bold font-pixel text-center mb-8">LOGIN</h2>

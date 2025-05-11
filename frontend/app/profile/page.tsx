@@ -63,7 +63,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fffcb2] flex flex-col">
+    <main className="min-h-screen bg-[#fffdd0] flex flex-col">
       <Header />
 
       <div className="flex-1 p-4 max-w-3xl mx-auto w-full">

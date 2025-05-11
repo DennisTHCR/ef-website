@@ -154,24 +154,34 @@ export class BattleController {
   // Get top ranked cards
   async getTopRankedCards(req: Request, res: Response): Promise<void> {
     try {
-      const { limit = 10, seasonId } = req.query;
-
       const cardRepository = getRepository(Card);
-      let query = cardRepository
-        .createQueryBuilder('card')
-        .leftJoinAndSelect('card.season', 'season')
-        .orderBy('card.rating', 'DESC')
-        .take(Number(limit));
+      const seasonRepository = getRepository(Season);
 
-      if (seasonId) {
-        query = query.where('card.season.id = :seasonId', { seasonId });
+      // Check if the season exists
+      const season = await seasonRepository.findOne({
+        where: { isActive: true },
+      });
+
+      if (!season) {
+        res.status(404).json({ message: 'Season not found' });
+        return;
       }
 
-      const cards = await query.getMany();
+      const seasonId = season.id;
 
-      res.status(200).json({ cards });
+      // Get top rated cards for the season
+      const topCards = await cardRepository.find({
+        where: { season: { id: Number(seasonId) } },
+        order: { rating: 'DESC' },
+        take: 100,
+      });
+
+      res.status(200).json({
+        season,
+        leaderboard: topCards,
+      });
     } catch (error) {
-      console.error('Get top ranked cards error:', error);
+      console.error('Get season leaderboard error:', error);
       res.status(500).json({ message: 'Server error' });
     }
   }

@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getTopRankedCards } from "@/utils/api-service"
 
 interface LeaderboardProps {
-  isFullPage?: boolean
+  isFullPage?: boolean,
+  topCards: LeaderboardCard[],
+  isLoading: boolean,
 }
 
 interface LeaderboardCard {
@@ -13,25 +14,14 @@ interface LeaderboardCard {
   subject: string
 }
 
-export default function Leaderboard({ isFullPage = false }: LeaderboardProps) {
-  const [topCards, setTopCards] = useState<LeaderboardCard[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
+export default function Leaderboard({ isFullPage = false, topCards = [], isLoading = true }: LeaderboardProps) {
   useEffect(() => {
-    fetchTopCards()
+    isLoading
   }, [])
 
-  async function fetchTopCards() {
-    setIsLoading(true)
-    try {
-      const data = await getTopRankedCards(10)
-      setTopCards(data.cards || [])
-    } catch (error) {
-      console.error("Failed to fetch top cards:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  useEffect(() => {
+    topCards
+  }, [])
 
   return (
     <div className={`bg-[#ffe3b2] ${isFullPage ? "w-full max-w-4xl mx-auto" : "w-full h-full overflow-auto"}`}>
