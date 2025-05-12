@@ -10,47 +10,64 @@ interface TeacherCardProps {
   onVote?: (cardId: string) => void
   onSelect?: () => void
   isSelected?: boolean
-  cardHeight?: number
-  onHeightChange?: (height: number) => void
 }
 
 function teacherNameToWebString(teacherName: string): string {
-  if (!teacherName || typeof teacherName !== 'string') {
-    return '';
+  if (!teacherName || typeof teacherName !== "string") {
+    return ""
   }
 
   // Convert to lowercase
-  let webString = teacherName.toLowerCase();
+  let webString = teacherName.toLowerCase()
 
   // Replace umlauts and other diacritical marks
   const charMap: Record<string, string> = {
-    'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss',
-    'á': 'a', 'à': 'a', 'â': 'a', 'ã': 'a', 'å': 'a',
-    'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
-    'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
-    'ó': 'o', 'ò': 'o', 'ô': 'o', 'õ': 'o',
-    'ú': 'u', 'ù': 'u', 'û': 'u',
-    'ñ': 'n', 'ç': 'c'
-  };
+    ä: "ae",
+    ö: "oe",
+    ü: "ue",
+    ß: "ss",
+    á: "a",
+    à: "a",
+    â: "a",
+    ã: "a",
+    å: "a",
+    é: "e",
+    è: "e",
+    ê: "e",
+    ë: "e",
+    í: "i",
+    ì: "i",
+    î: "i",
+    ï: "i",
+    ó: "o",
+    ò: "o",
+    ô: "o",
+    õ: "o",
+    ú: "u",
+    ù: "u",
+    û: "u",
+    ñ: "n",
+    ç: "c",
+  }
 
   // Replace diacritical marks
   for (const [key, value] of Object.entries(charMap)) {
-    webString = webString.replace(new RegExp(key, 'g'), value);
+    webString = webString.replace(new RegExp(key, "g"), value)
   }
 
   // Remove all remaining non-alphanumeric characters except hyphens and replace spaces with hyphens
-  webString = webString.replace(/\s+/g, '-');
+  webString = webString.replace(/\s+/g, "-")
 
   // Remove any remaining non-alphanumeric characters (except hyphens)
-  webString = webString.replace(/[^a-z0-9-]/g, '');
+  webString = webString.replace(/[^a-z0-9-]/g, "")
 
   // Remove multiple consecutive hyphens
-  webString = webString.replace(/-+/g, '-');
+  webString = webString.replace(/-+/g, "-")
 
   // Remove leading and trailing hyphens
-  webString = webString.replace(/^-+|-+$/g, '');
+  webString = webString.replace(/^-+|-+$/g, "")
 
-  return webString;
+  return webString
 }
 
 export default function TeacherCard({
@@ -61,29 +78,106 @@ export default function TeacherCard({
   onVote,
   onSelect,
   isSelected = false,
-  cardHeight,
-  onHeightChange,
 }: TeacherCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [naturalHeight, setNaturalHeight] = useState<number | null>(null)
+  const nameRef = useRef<HTMLHeadingElement>(null)
+  const quoteRef = useRef<HTMLParagraphElement>(null)
+  const subjectRef = useRef<HTMLSpanElement>(null)
+  const [nameFontSize, setNameFontSize] = useState(24) // Default font size in pixels
+  const [quoteFontSize, setQuoteFontSize] = useState(18) // Default font size in pixels
+  const [subjectFontSize, setSubjectFontSize] = useState(14) // Default font size in pixels
+  const [imageError, setImageError] = useState(false)
 
-  // Measure the natural height of the card
-  useEffect(() => {
-    if (cardRef.current) {
-      const observer = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          const height = entry.contentRect.height
-          setNaturalHeight(height)
-          if (onHeightChange) {
-            onHeightChange(height)
-          }
+  // Function to adjust text size to fit container
+  const adjustTextSize = () => {
+    // Adjust name font size
+    if (nameRef.current) {
+      const nameContainer = nameRef.current.parentElement
+      if (nameContainer) {
+        const containerWidth = nameContainer.clientWidth
+        const containerHeight = nameContainer.clientHeight
+        let fontSize = 24 // Start with default size
+
+        nameRef.current.style.fontSize = `${fontSize}px`
+
+        // Reduce font size until text fits within container
+        while (
+          (nameRef.current.scrollWidth > containerWidth || nameRef.current.scrollHeight > containerHeight) &&
+          fontSize > 10
+        ) {
+          fontSize -= 1
+          nameRef.current.style.fontSize = `${fontSize}px`
         }
-      })
 
-      observer.observe(cardRef.current)
-      return () => observer.disconnect()
+        setNameFontSize(fontSize)
+      }
     }
-  }, [quote, onHeightChange])
+
+    // Adjust quote font size
+    if (quoteRef.current) {
+      const quoteContainer = quoteRef.current.parentElement
+      if (quoteContainer) {
+        const containerWidth = quoteContainer.clientWidth
+        const containerHeight = quoteContainer.clientHeight
+        let fontSize = 18 // Start with default size
+
+        quoteRef.current.style.fontSize = `${fontSize}px`
+
+        // Reduce font size until text fits within container
+        while (
+          (quoteRef.current.scrollWidth > containerWidth || quoteRef.current.scrollHeight > containerHeight) &&
+          fontSize > 8
+        ) {
+          fontSize -= 1
+          quoteRef.current.style.fontSize = `${fontSize}px`
+        }
+
+        setQuoteFontSize(fontSize)
+      }
+    }
+
+    // Adjust subject font size
+    if (subjectRef.current && subject) {
+      const subjectContainer = subjectRef.current.parentElement
+      if (subjectContainer) {
+        const containerStyles = window.getComputedStyle(subjectContainer)
+        const paddingLeft = Number.parseFloat(containerStyles.paddingLeft)
+        const paddingRight = Number.parseFloat(containerStyles.paddingRight)
+
+        const containerWidth = subjectContainer.clientWidth - paddingLeft - paddingRight
+        let fontSize = 14 // Start with default size
+
+        subjectRef.current.style.fontSize = `${fontSize}px`
+
+        // Reduce font size until text fits within container
+        while (subjectRef.current.scrollWidth > containerWidth && fontSize > 8) {
+          fontSize -= 1
+          subjectRef.current.style.fontSize = `${fontSize}px`
+        }
+
+        setSubjectFontSize(fontSize)
+      }
+    }
+  }
+
+  // Handle image load error
+  const handleImageError = () => {
+    setImageError(true)
+  }
+
+  // Adjust text size on initial render and when content changes
+  useEffect(() => {
+    // Small delay to ensure DOM is fully rendered
+    const timer = setTimeout(() => {
+      adjustTextSize()
+    }, 0)
+
+    // Also adjust on window resize
+    window.addEventListener("resize", adjustTextSize)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener("resize", adjustTextSize)
+    }
+  }, [name, quote, subject, imageError])
 
   const handleClick = () => {
     if (onVote) {
@@ -93,23 +187,87 @@ export default function TeacherCard({
     }
   }
 
+  // Fixed card dimensions
+  const CARD_WIDTH = 320 // pixels
+  const CARD_HEIGHT = 448 // pixels (based on 2.5:3.5 aspect ratio)
+
   return (
     <div
-      ref={cardRef}
-      className={`h-full bg-[#f7e8d4] rounded-3xl p-3 border-2 ${isSelected ? "border-red-500 border-4" : "border-black"} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-[320px] flex flex-col cursor-pointer hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-shadow`}
+      className={`bg-[#f7e8d4] rounded-3xl p-3 border-2 ${isSelected ? "border-red-500 border-4" : "border-black"
+        } shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-shadow cursor-pointer`}
+      style={{
+        width: `${CARD_WIDTH}px`,
+        height: `${CARD_HEIGHT}px`,
+      }}
       onClick={handleClick}
     >
-      <div className="p-2 flex-1 flex flex-col">
-        <h2 className="text-2xl font-bold mb-2 font-pixel">{name}</h2>
-        {subject && (
-          <div className="bg-[#ffe3b2] px-2 py-1 mb-2 border border-black inline-block self-start">
-            <span className="font-pixel text-sm">{subject}</span>
-          </div>
-        )}
-        <div className="bg-[#d9d9d9] w-full h-full mb-3 overflow-hidden">
-          <img src={`https://cdn.kswofficial.fr/quotemon_images/${teacherNameToWebString(name)}.png`} />
+      <div className="flex flex-col h-full">
+        {/* Name section - fixed height */}
+        <div className="h-[64px] flex items-center justify-center mb-2 px-2">
+          <h2
+            ref={nameRef}
+            className="font-bold font-pixel w-full text-center overflow-hidden"
+            style={{ fontSize: `${nameFontSize}px` }}
+          >
+            {name}
+          </h2>
         </div>
-        <p className="text-lg text-center font-bold font-pixel">{quote}</p>
+
+        {/* Image container - fixed square dimensions */}
+        <div className="relative w-full h-[280px] bg-[#d9d9d9] mb-3 overflow-hidden border border-black">
+          {!imageError ? (
+            <img
+              src={`https://cdn.kswofficial.fr/quotemon_images/${teacherNameToWebString(name)}.png`}
+              alt={name}
+              className="w-full h-full object-cover"
+              onError={handleImageError}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-[#d9d9d9]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-1/2 h-1/2 text-gray-400"
+              >
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+              </svg>
+            </div>
+          )}
+
+          {/* Subject tag positioned at bottom left of image with dynamic text sizing */}
+          {subject && (
+            <div
+              className="absolute bottom-1 left-1 bg-[#ffe3b2] px-2 py-1 border border-black inline-flex items-center justify-center"
+              style={{ maxWidth: "40%" }}
+            >
+              <span
+                ref={subjectRef}
+                className="font-pixel block text-center overflow-hidden"
+                style={{ fontSize: `${subjectFontSize}px` }}
+              >
+                {subject}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Quote section - fixed height */}
+        <div className="h-[80px] flex items-center justify-center px-2">
+          <p
+            ref={quoteRef}
+            className="text-center font-bold font-pixel w-full overflow-hidden"
+            style={{ fontSize: `${quoteFontSize}px` }}
+          >
+            {quote}
+          </p>
+        </div>
       </div>
     </div>
   )
