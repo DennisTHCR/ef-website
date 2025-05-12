@@ -5,6 +5,8 @@ import { Quote } from '../models/quote.model';
 import { Subject } from '../models/subject.model';
 import { Season } from '../models/season.model';
 import { Card } from '../models/card.model';
+import { User } from '../models/user.model';
+import bcrypt from 'bcryptjs';
 
 export class AdminController {
   // TEACHER OPERATIONS
@@ -695,6 +697,39 @@ export class AdminController {
       });
     } catch (error) {
       console.error('Delete card error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+
+  async resetUserPassword(req: Request, res: Response) {
+    try {
+      const { username, newPassword } = req.body;
+
+      if (!username || !newPassword) {
+        return res.status(400).json({ message: 'Username and new password are required' });
+      }
+
+      const userRepository = getRepository(User);
+
+      const user = await userRepository.findOne({ where: { username } });
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+
+      user.password = hashedPassword;
+      await userRepository.save(user);
+
+      res.status(200).json({
+        message: 'Password reset successfully',
+        username: user.username
+      });
+    } catch (error) {
+      console.error('Reset user password error:', error);
       res.status(500).json({ message: 'Server error' });
     }
   }

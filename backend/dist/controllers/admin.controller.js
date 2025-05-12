@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const typeorm_1 = require("typeorm");
@@ -7,6 +10,8 @@ const quote_model_1 = require("../models/quote.model");
 const subject_model_1 = require("../models/subject.model");
 const season_model_1 = require("../models/season.model");
 const card_model_1 = require("../models/card.model");
+const user_model_1 = require("../models/user.model");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 class AdminController {
     // TEACHER OPERATIONS
     async createTeacher(req, res) {
@@ -586,6 +591,31 @@ class AdminController {
         }
         catch (error) {
             console.error('Delete card error:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    async resetUserPassword(req, res) {
+        try {
+            const { username, newPassword } = req.body;
+            if (!username || !newPassword) {
+                return res.status(400).json({ message: 'Username and new password are required' });
+            }
+            const userRepository = (0, typeorm_1.getRepository)(user_model_1.User);
+            const user = await userRepository.findOne({ where: { username } });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            const salt = await bcryptjs_1.default.genSalt(10);
+            const hashedPassword = await bcryptjs_1.default.hash(newPassword, salt);
+            user.password = hashedPassword;
+            await userRepository.save(user);
+            res.status(200).json({
+                message: 'Password reset successfully',
+                username: user.username
+            });
+        }
+        catch (error) {
+            console.error('Reset user password error:', error);
             res.status(500).json({ message: 'Server error' });
         }
     }

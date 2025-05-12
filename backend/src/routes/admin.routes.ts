@@ -53,4 +53,7 @@ router.post('/seasons/:seasonId/generate-cards', adminController.generateCards);
 router.get('/seasons/:seasonId/cards', adminController.getCardsBySeasonId);
 router.delete('/cards/:id', adminController.deleteCard);
 
+// User management routes
+router.post('/users/reset-password', adminController.resetUserPassword);
+
 export default router;
