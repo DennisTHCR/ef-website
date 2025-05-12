@@ -78,11 +78,11 @@ export default function DeckPage() {
       for (const card of dealtCards) {
         try {
           // Get card details
-          const cardDetails = await getCardByType(card.type)
+          const cardDetails = (await getCardByType(card.type)).card
 
           // Find season from the already fetched seasons
-          const season = allSeasons.find((s) => s.id === card.season.id) || {
-            id: card.season.id,
+          const season = allSeasons.find((s) => s.id === cardDetails.season.id) || {
+            id: cardDetails.season.id,
             name: "Unknown Season",
           }
 
@@ -90,9 +90,9 @@ export default function DeckPage() {
             id: card.id,
             type: card.type,
             level: card.level,
-            teacherName: cardDetails.card.teacherName,
-            subject: cardDetails.card.subject,
-            quote: cardDetails.card.quote,
+            teacherName: cardDetails.teacherName,
+            subject: cardDetails.subject,
+            quote: cardDetails.quote,
             season: season,
           })
         } catch (error) {
@@ -110,23 +110,28 @@ export default function DeckPage() {
   }
 
   // Group cards by season
-  const cardsBySeasonAndType = () => {
-    const groupedCards: Record<string, Record<string, CardWithDetails[]>> = {}
+  const groupCardsBySeason = () => {
+    const groupedCards: Record<string, CardWithDetails[]> = {}
 
-    // Group cards by season name
+    // Group cards by season
     cards.forEach((card) => {
       const seasonName = card.season?.name || "Unknown Season"
       if (!groupedCards[seasonName]) {
-        groupedCards[seasonName] = {}
+        groupedCards[seasonName] = []
       }
+      groupedCards[seasonName].push(card)
+    })
 
-      // Group by type within each season
-      const type = card.type
-      if (!groupedCards[seasonName][type]) {
-        groupedCards[seasonName][type] = []
-      }
+    // Sort cards within each season by teacher name
+    Object.keys(groupedCards).forEach((seasonName) => {
+      groupedCards[seasonName].sort((a, b) => {
+        // First sort by teacher name
+        const teacherCompare = a.teacherName.localeCompare(b.teacherName)
+        if (teacherCompare !== 0) return teacherCompare
 
-      groupedCards[seasonName][type].push(card)
+        // If same teacher, sort by type
+        return a.type.localeCompare(b.type)
+      })
     })
 
     return groupedCards
@@ -151,7 +156,7 @@ export default function DeckPage() {
     return null // Don't render anything while checking auth or redirecting
   }
 
-  const groupedCards = cardsBySeasonAndType()
+  const groupedCards = groupCardsBySeason()
   const sortedSeasonNames = getSortedSeasonNames()
 
   return (
@@ -170,20 +175,16 @@ export default function DeckPage() {
               <div key={seasonName} className="space-y-4">
                 <h2 className="text-3xl font-bold font-pixel text-center border-b-2 border-black pb-2">{seasonName}</h2>
 
-                {/* Group cards by type within each season */}
-                <div className="flex flex-wrap justify-center gap-6">
-                  {Object.entries(groupedCards[seasonName]).map(([type, typeCards]) => (
-                    <div key={type} className="flex flex-wrap justify-center gap-4">
-                      {typeCards.map((card) => (
-                        <TeacherCard
-                          key={card.id}
-                          id={card.id}
-                          name={card.teacherName}
-                          quote={card.quote}
-                          subject={card.subject}
-                        />
-                      ))}
-                    </div>
+                {/* Display all cards in this season, sorted by teacher */}
+                <div className="flex flex-wrap justify-center gap-4">
+                  {groupedCards[seasonName].map((card) => (
+                    <TeacherCard
+                      key={card.id}
+                      id={card.id}
+                      name={card.teacherName}
+                      quote={card.quote}
+                      subject={card.subject}
+                    />
                   ))}
                 </div>
               </div>
