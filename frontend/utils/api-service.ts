@@ -175,3 +175,8 @@ export async function validateToken() {
 export async function getTrainerCards(trainerId: string) {
   return fetchAPI(`/trainers/${trainerId}/cards`)
 }
+
+// Get seasons
+export async function getAllSeasons() {
+  return fetchAPI('/seasons/')
+}

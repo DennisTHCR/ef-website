@@ -29,7 +29,8 @@ export class CardController {
       const { type } = req.params;
       const cardRepository = getRepository(Card);
       const card = await cardRepository.findOne({
-        where: { type }
+        where: { type },
+        relations: ['season'],
       });
 
       if (!card) {
