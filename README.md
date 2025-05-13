@@ -64,3 +64,4 @@ To make sure everybody is okay with their picture on the website, we will ask ev
 - [ ] Viola Boye
 - [ ] Zensi Hopf
 - [ ] Anselm Zikeli
+- [ ] Valentin Scherrer
