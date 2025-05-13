@@ -15,4 +15,5 @@ router.post('/open-pack', auth_middleware_1.authMiddleware, cardController.openP
 router.post('/claim-daily', auth_middleware_1.authMiddleware, cardController.claimDailyPack);
 router.post('/upgrade', auth_middleware_1.authMiddleware, cardController.upgradeCard);
 router.post('/sell', auth_middleware_1.authMiddleware, cardController.sellCard);
+router.post('/buy-pack', auth_middleware_1.authMiddleware, cardController.buyPack);
 exports.default = router;

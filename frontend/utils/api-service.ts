@@ -109,6 +109,10 @@ export async function claimDailyPack() {
   return fetchAPI("/cards/claim-daily", { method: "POST" })
 }
 
+export async function buyPack() {
+  return fetchAPI("/cards/buy-pack", { method: "POST" })
+}
+
 // Season APIs
 export async function getCurrentSeason() {
   return fetchAPI("/seasons/current")

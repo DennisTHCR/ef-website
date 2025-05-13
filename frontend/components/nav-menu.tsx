@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
-import { claimDailyPack, openPack, getTradeOffers, getUserProfile } from "@/utils/api-service"
+import { claimDailyPack, buyPack, openPack, getTradeOffers, getUserProfile } from "@/utils/api-service"
 
 // Define different types of menu items
 type MenuItemAction =
@@ -95,6 +95,21 @@ export default function NavMenu() {
       },
       count: "CLAIM",
       disabled: !menuData.canClaimDaily,
+    },
+    {
+      id: "buyPack",
+      label: "BUY PACK (100 COINS)",
+      action: {
+        type: "api",
+        handler: async () => {
+          const result = await buyPack()
+          if (result) {
+            toast.success("Bought pack successfully!")
+            await refreshUserData()
+            await fetchMenuData()
+          }
+        },
+      },
     },
     {
       id: "openPack",
