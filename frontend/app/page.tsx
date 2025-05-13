@@ -115,12 +115,15 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fffdd0] flex flex-col">
-      <Header />
+    // Main container div that takes up 100vh and 100vw
+    <div className="h-screen w-screen max-h-screen max-w-screen overflow-hidden bg-[#fffdd0] flex flex-col">
+      {/* Header in a separate div */}
+      <Header className="flex-shrink-0" />
 
-      <div className="flex h-full min-h-full flex-col md:flex-row flex-1">
-        {/* Main Content */}
-        <div className="flex-1 p-4 h-full min-h-full flex flex-col md:flex-row flex-wrap justify-evenly items-stretch gap-6 content-evenly">
+      {/* Content div with game on left and leaderboard on right */}
+      <div className="flex flex-1 min-h-0">
+        {/* Game area (left side) */}
+        <div className="flex-1 p-4 flex flex-col md:flex-row flex-wrap justify-evenly items-stretch gap-6 content-evenly overflow-auto min-h-0 min-w-0">
           {isLoading ? (
             <div className="font-pixel text-2xl">LOADING TEACHERS...</div>
           ) : (
@@ -151,11 +154,11 @@ export default function Home() {
           )}
         </div>
 
-        {/* Leaderboard Sidebar - only visible on very wide screens */}
-        <div className="hidden 2xl:block border-l-2 border-black w-[32rem]">
-          <Leaderboard topCards={topCards || []} isLoading={isLeaderLoading} />
+        {/* Leaderboard (right side) - only visible on very wide screens */}
+        <div className="hidden 2xl:block border-l-2 border-black w-[32rem] min-h-0 flex-shrink-0">
+          <Leaderboard topCards={topCards || []} isLoading={isLeaderLoading} className="h-full" />
         </div>
       </div>
-    </main>
+    </div>
   )
 }
