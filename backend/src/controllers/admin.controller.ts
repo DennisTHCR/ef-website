@@ -735,9 +735,6 @@ export class AdminController {
     }
   }
 
-  // Add these methods to the AdminController class in admin.controller.ts
-
-  // USER OPERATIONS
   async createUser(req: Request, res: Response) {
     try {
       const { username, password } = req.body;
