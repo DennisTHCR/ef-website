@@ -48,4 +48,9 @@ router.get('/seasons/:seasonId/cards', adminController.getCardsBySeasonId);
 router.delete('/cards/:id', adminController.deleteCard);
 // User management routes
 router.post('/users/reset-password', adminController.resetUserPassword);
+router.post('/users', adminController.createUser);
+router.get('/users', adminController.getAllUsers);
+router.get('/users/:id', adminController.getUserById);
+router.put('/users/:id', adminController.updateUser);
+router.delete('/users/:id', adminController.deleteUser);
 exports.default = router;

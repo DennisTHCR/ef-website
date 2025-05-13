@@ -12,6 +12,7 @@ const season_model_1 = require("../models/season.model");
 const card_model_1 = require("../models/card.model");
 const user_model_1 = require("../models/user.model");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const dealt_card_model_1 = require("../models/dealt_card.model");
 class AdminController {
     // TEACHER OPERATIONS
     async createTeacher(req, res) {
@@ -616,6 +617,136 @@ class AdminController {
         }
         catch (error) {
             console.error('Reset user password error:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    async createUser(req, res) {
+        try {
+            const { username, password } = req.body;
+            if (!username || !password) {
+                return res.status(400).json({ message: 'Username and password are required' });
+            }
+            const userRepository = (0, typeorm_1.getRepository)(user_model_1.User);
+            // Check if user already exists
+            const existingUser = await userRepository.findOne({ where: { username } });
+            if (existingUser) {
+                return res.status(400).json({ message: 'User with this username already exists' });
+            }
+            // Hash password
+            const salt = await bcryptjs_1.default.genSalt(10);
+            const hashedPassword = await bcryptjs_1.default.hash(password, salt);
+            // Create new user
+            const user = userRepository.create({
+                username,
+                password: hashedPassword,
+                coins: 0,
+                rating: 0
+            });
+            await userRepository.save(user);
+            // Don't return the password in the response
+            const { password: _, ...userWithoutPassword } = user;
+            res.status(201).json({
+                message: 'User created successfully',
+                user: userWithoutPassword
+            });
+        }
+        catch (error) {
+            console.error('Create user error:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    async getAllUsers(req, res) {
+        try {
+            const userRepository = (0, typeorm_1.getRepository)(user_model_1.User);
+            const users = await userRepository.find({
+                select: ['id', 'username', 'coins', 'rating', 'createdAt', 'updatedAt', 'lastPackClaim']
+            });
+            res.status(200).json({ users });
+        }
+        catch (error) {
+            console.error('Get all users error:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    async getUserById(req, res) {
+        try {
+            const { id } = req.params;
+            const userRepository = (0, typeorm_1.getRepository)(user_model_1.User);
+            const user = await userRepository.findOne({
+                where: { id },
+                select: ['id', 'username', 'coins', 'rating', 'createdAt', 'updatedAt', 'lastPackClaim'],
+                relations: ['cards']
+            });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            res.status(200).json({ user });
+        }
+        catch (error) {
+            console.error('Get user by id error:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    async updateUser(req, res) {
+        try {
+            const { id } = req.params;
+            const { username, coins, rating } = req.body;
+            const userRepository = (0, typeorm_1.getRepository)(user_model_1.User);
+            const user = await userRepository.findOneBy({ id });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            // Check if username is being updated and if it already exists
+            if (username && username !== user.username) {
+                const existingUser = await userRepository.findOne({ where: { username } });
+                if (existingUser) {
+                    return res.status(400).json({ message: 'Username already taken' });
+                }
+                user.username = username;
+            }
+            // Update other fields if provided
+            if (coins !== undefined)
+                user.coins = coins;
+            if (rating !== undefined)
+                user.rating = rating;
+            await userRepository.save(user);
+            // Don't return the password in the response
+            const { password: _, ...userWithoutPassword } = user;
+            res.status(200).json({
+                message: 'User updated successfully',
+                user: userWithoutPassword
+            });
+        }
+        catch (error) {
+            console.error('Update user error:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+    async deleteUser(req, res) {
+        try {
+            const { id } = req.params;
+            const userRepository = (0, typeorm_1.getRepository)(user_model_1.User);
+            const dealtCardRepository = (0, typeorm_1.getRepository)(dealt_card_model_1.DealtCard);
+            // Find user
+            const user = await userRepository.findOne({
+                where: { id },
+                relations: ['cards']
+            });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            // Delete associated dealt cards first (if any)
+            if (user.cards && user.cards.length > 0) {
+                await dealtCardRepository.remove(user.cards);
+            }
+            // Delete the user
+            await userRepository.remove(user);
+            res.status(200).json({
+                message: 'User deleted successfully'
+            });
+        }
+        catch (error) {
+            console.error('Delete user error:', error);
             res.status(500).json({ message: 'Server error' });
         }
     }
