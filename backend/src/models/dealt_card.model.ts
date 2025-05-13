@@ -7,7 +7,7 @@ export class DealtCard {
   id: string;
   @Column()
   type: string;
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   owner: User;
   @Column({ default: 1 })
   level: number;

@@ -7,10 +7,10 @@ export class Trade {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   offeredBy: User;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   offeredTo: User | null;
 
   @ManyToOne(() => DealtCard)

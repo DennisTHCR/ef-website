@@ -419,6 +419,7 @@ export class CardController {
       // Check if the user has enough balance
       if (user.coins < 100) {
         res.status(404).json({ message: 'Not enough balance' });
+        return;
       }
 
       // Get current active season

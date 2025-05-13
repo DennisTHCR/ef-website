@@ -9,7 +9,7 @@ export class Pack {
   @Column()
   seasonId: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   owner: User;
 
   @Column({ default: false })
