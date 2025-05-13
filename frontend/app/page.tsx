@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Header from "@/components/header"
 import TeacherCard from "@/components/teacher-card"
 import Leaderboard from "@/components/leaderboard"
+import PageBackground from "@/components/page-background"
 import { getBattleCards, getTopRankedCards, voteOnBattle } from "@/utils/api-service"
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "sonner"
@@ -115,50 +116,52 @@ export default function Home() {
   }
 
   return (
-    // Main container div that takes up 100vh and 100vw
-    <div className="h-screen w-screen max-h-screen max-w-screen overflow-hidden bg-[#fffdd0] flex flex-col">
-      {/* Header in a separate div */}
-      <Header className="flex-shrink-0" />
+    <PageBackground>
+      {/* Main container div that takes up 100vh and 100vw */}
+      <div className="h-screen w-screen max-h-screen max-w-screen overflow-hidden flex flex-col">
+        {/* Header in a separate div */}
+        <Header className="flex-shrink-0" />
 
-      {/* Content div with game on left and leaderboard on right */}
-      <div className="flex flex-1 min-h-0">
-        {/* Game area (left side) */}
-        <div className="flex-1 p-4 flex flex-col md:flex-row flex-wrap justify-evenly items-stretch gap-6 content-evenly overflow-auto min-h-0 min-w-0">
-          {isLoading ? (
-            <div className="font-pixel text-2xl">LOADING TEACHERS...</div>
-          ) : (
-            <>
-              {cards.card1 && (
-                <TeacherCard
-                  id={cards.card1.type}
-                  name={cards.card1.teacherName}
-                  quote={cards.card1.quote}
-                  subject={cards.card1.subject}
-                  onVote={isVoting ? undefined : handleVote}
-                  cardHeight={maxCardHeight || undefined}
-                  onHeightChange={(height) => handleCardHeightChange(cards.card1.type, height)}
-                />
-              )}
-              {cards.card2 && (
-                <TeacherCard
-                  id={cards.card2.type}
-                  name={cards.card2.teacherName}
-                  quote={cards.card2.quote}
-                  subject={cards.card2.subject}
-                  onVote={isVoting ? undefined : handleVote}
-                  cardHeight={maxCardHeight || undefined}
-                  onHeightChange={(height) => handleCardHeightChange(cards.card2.type, height)}
-                />
-              )}
-            </>
-          )}
-        </div>
+        {/* Content div with game on left and leaderboard on right */}
+        <div className="flex flex-1 min-h-0">
+          {/* Game area (left side) */}
+          <div className="flex-1 p-4 flex flex-col md:flex-row flex-wrap justify-evenly items-stretch gap-6 content-evenly overflow-auto min-h-0 min-w-0">
+            {isLoading ? (
+              <div className="font-pixel text-2xl">LOADING TEACHERS...</div>
+            ) : (
+              <>
+                {cards.card1 && (
+                  <TeacherCard
+                    id={cards.card1.type}
+                    name={cards.card1.teacherName}
+                    quote={cards.card1.quote}
+                    subject={cards.card1.subject}
+                    onVote={isVoting ? undefined : handleVote}
+                    cardHeight={maxCardHeight || undefined}
+                    onHeightChange={(height) => handleCardHeightChange(cards.card1.type, height)}
+                  />
+                )}
+                {cards.card2 && (
+                  <TeacherCard
+                    id={cards.card2.type}
+                    name={cards.card2.teacherName}
+                    quote={cards.card2.quote}
+                    subject={cards.card2.subject}
+                    onVote={isVoting ? undefined : handleVote}
+                    cardHeight={maxCardHeight || undefined}
+                    onHeightChange={(height) => handleCardHeightChange(cards.card2.type, height)}
+                  />
+                )}
+              </>
+            )}
+          </div>
 
-        {/* Leaderboard (right side) - only visible on very wide screens */}
-        <div className="hidden 2xl:block border-l-2 border-black w-[32rem] min-h-0 flex-shrink-0">
-          <Leaderboard topCards={topCards || []} isLoading={isLeaderLoading} className="h-full" />
+          {/* Leaderboard (right side) - only visible on very wide screens */}
+          <div className="hidden 2xl:block border-l-2 border-black w-[32rem] min-h-0 flex-shrink-0 bg-[#fffdd0]/80 backdrop-blur-sm">
+            <Leaderboard topCards={topCards || []} isLoading={isLeaderLoading} className="h-full" />
+          </div>
         </div>
       </div>
-    </div>
+    </PageBackground>
   )
 }

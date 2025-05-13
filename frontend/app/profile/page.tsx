@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Header from "@/components/header"
+import PageBackground from "@/components/page-background"
 import { useAuth } from "@/contexts/auth-context"
 import { getUserProfile, getTopTrainers } from "@/utils/api-service"
 
@@ -63,35 +64,41 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fffdd0] flex flex-col">
-      <Header />
+    <PageBackground>
+      <main className="min-h-screen flex flex-col">
+        <Header />
 
-      <div className="flex-1 p-4 max-w-3xl mx-auto w-full">
-        {isLoadingProfile ? (
-          <div className="text-center font-pixel text-2xl p-8">LOADING PROFILE...</div>
-        ) : profile ? (
-          <div className="bg-[#fffcb2] border-2 border-black">
-            <div className="p-4 border-b-2 border-black">
-              <h2 className="text-4xl font-bold font-pixel text-center">PROFILE</h2>
+        <div className="flex-1 p-4 max-w-3xl mx-auto w-full">
+          {isLoadingProfile ? (
+            <div className="text-center font-pixel text-2xl p-8 bg-[#fffdd0]/90 backdrop-blur-sm rounded-lg">
+              LOADING PROFILE...
             </div>
+          ) : profile ? (
+            <div className="bg-[#fffcb2]/90 backdrop-blur-sm border-2 border-black rounded-lg">
+              <div className="p-4 border-b-2 border-black">
+                <h2 className="text-4xl font-bold font-pixel text-center">PROFILE</h2>
+              </div>
 
-            <div className="divide-y-2 divide-black">
-              <div className="p-4 text-xl font-bold font-pixel">NAME: {profile.username}</div>
-              {profile.rank && (
-                <div className="p-4 text-xl font-bold font-pixel">
-                  RANK: {profile.rank}
-                  {getOrdinalSuffix(profile.rank)}
-                </div>
-              )}
-              <div className="p-4 text-xl font-bold font-pixel">RATING: {profile.rating}</div>
-              <div className="p-4 text-xl font-bold font-pixel">COINS: {profile.coins}</div>
+              <div className="divide-y-2 divide-black">
+                <div className="p-4 text-xl font-bold font-pixel">NAME: {profile.username}</div>
+                {profile.rank && (
+                  <div className="p-4 text-xl font-bold font-pixel">
+                    RANK: {profile.rank}
+                    {getOrdinalSuffix(profile.rank)}
+                  </div>
+                )}
+                <div className="p-4 text-xl font-bold font-pixel">RATING: {profile.rating}</div>
+                <div className="p-4 text-xl font-bold font-pixel">COINS: {profile.coins}</div>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="text-center font-pixel text-2xl p-8">PROFILE NOT FOUND</div>
-        )}
-      </div>
-    </main>
+          ) : (
+            <div className="text-center font-pixel text-2xl p-8 bg-[#fffdd0]/90 backdrop-blur-sm rounded-lg">
+              PROFILE NOT FOUND
+            </div>
+          )}
+        </div>
+      </main>
+    </PageBackground>
   )
 }
 

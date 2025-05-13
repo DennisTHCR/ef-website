@@ -1,8 +1,11 @@
 "use client"
 
+"use client"
+
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Header from "@/components/header"
+import PageBackground from "@/components/page-background"
 import { useAuth } from "@/contexts/auth-context"
 import { getUserCards, getCardByType, getAllSeasons } from "@/utils/api-service"
 import TeacherCard from "@/components/teacher-card"
@@ -160,41 +163,46 @@ export default function DeckPage() {
   const sortedSeasonNames = getSortedSeasonNames()
 
   return (
-    <main className="min-h-screen bg-[#fffdd0] flex flex-col">
-      <Header />
+    <PageBackground>
+      <main className="min-h-screen flex flex-col">
+        <Header />
 
-      <div className="flex-1 p-4">
-        <h1 className="text-4xl font-bold font-pixel text-center mb-8">YOUR DECK</h1>
+        <div className="flex-1 p-4">
+          <div className="bg-[#fffdd0]/90 backdrop-blur-sm p-6 rounded-lg border-2 border-black">
+            <h1 className="text-4xl font-bold font-pixel text-center mb-8">YOUR DECK</h1>
 
-        {isLoadingCards ? (
-          <div className="text-center font-pixel text-2xl p-8">LOADING CARDS...</div>
-        ) : cards.length > 0 ? (
-          <div className="space-y-12">
-            {/* Display seasons in descending order by ID */}
-            {sortedSeasonNames.map((seasonName) => (
-              <div key={seasonName} className="space-y-4">
-                <h2 className="text-3xl font-bold font-pixel text-center border-b-2 border-black pb-2">{seasonName}</h2>
+            {isLoadingCards ? (
+              <div className="text-center font-pixel text-2xl p-8">LOADING CARDS...</div>
+            ) : cards.length > 0 ? (
+              <div className="space-y-12">
+                {/* Display seasons in descending order by ID */}
+                {sortedSeasonNames.map((seasonName) => (
+                  <div key={seasonName} className="space-y-4">
+                    <h2 className="text-3xl font-bold font-pixel text-center border-b-2 border-black pb-2">
+                      {seasonName}
+                    </h2>
 
-                {/* Display all cards in this season, sorted by teacher */}
-                <div className="flex flex-wrap justify-center gap-4">
-                  {groupedCards[seasonName].map((card) => (
-                    <TeacherCard
-                      key={card.id}
-                      id={card.id}
-                      name={card.teacherName}
-                      quote={card.quote}
-                      subject={card.subject}
-                    />
-                  ))}
-                </div>
+                    {/* Display all cards in this season, sorted by teacher */}
+                    <div className="flex flex-wrap justify-center gap-4">
+                      {groupedCards[seasonName].map((card) => (
+                        <TeacherCard
+                          key={card.id}
+                          id={card.id}
+                          name={card.teacherName}
+                          quote={card.quote}
+                          subject={card.subject}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="text-center font-pixel text-2xl p-8">NO CARDS IN YOUR DECK</div>
+            )}
           </div>
-        ) : (
-          <div className="text-center font-pixel text-2xl p-8">NO CARDS IN YOUR DECK</div>
-        )}
-      </div>
-    </main>
+        </div>
+      </main>
+    </PageBackground>
   )
 }
-

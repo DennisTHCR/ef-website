@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Header from "@/components/header"
+import PageBackground from "@/components/page-background"
 import { useAuth } from "@/contexts/auth-context"
 import { getTradeOffers, acceptTradeOffer, cancelTradeOffer } from "@/utils/api-service"
 import { toast } from "sonner"
@@ -100,82 +101,84 @@ export default function TradeOffersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#fffdd0] flex flex-col">
-      <Header />
+    <PageBackground>
+      <main className="min-h-screen flex flex-col">
+        <Header />
 
-      <div className="flex-1 p-4 max-w-3xl mx-auto w-full">
-        <div className="bg-[#fffcb2] border-2 border-black">
-          <div className="p-4 border-b-2 border-black">
-            <h2 className="text-4xl font-bold font-pixel text-center">TRADE OFFERS</h2>
-          </div>
-
-          {isLoadingTrades ? (
-            <div className="p-4 text-xl font-bold font-pixel text-center">LOADING TRADES...</div>
-          ) : trades.length > 0 ? (
-            <div className="divide-y-2 divide-black">
-              {trades.map((trade) => {
-                const isUserOfferer = trade.offeredBy.id === user?.id
-                const isProcessing = processingTradeId === trade.id
-
-                return (
-                  <div key={trade.id} className="p-4 font-pixel">
-                    <div className="mb-2">
-                      <span className="font-bold">
-                        {isUserOfferer ? "YOUR OFFER TO" : "OFFER FROM"}:{" "}
-                        {isUserOfferer ? trade.offeredTo.username : trade.offeredBy.username}
-                      </span>
-                    </div>
-
-                    <div className="mb-1">
-                      <span className="font-bold">OFFERING: </span>
-                      {trade.offeredCard.type} (Level {trade.offeredCard.level})
-                    </div>
-
-                    {trade.requestedCard ? (
-                      <div className="mb-1">
-                        <span className="font-bold">FOR: </span>
-                        {trade.requestedCard.type} (Level {trade.requestedCard.level})
-                      </div>
-                    ) : (
-                      <div className="mb-1">
-                        <span className="font-bold">ASKING PRICE: </span>
-                        {trade.askingPrice} COINS
-                      </div>
-                    )}
-
-                    <div className="mb-2">
-                      <span className="font-bold">DATE: </span>
-                      {new Date(trade.createdAt).toLocaleDateString()}
-                    </div>
-
-                    <div className="mt-2 flex justify-end gap-2">
-                      {isUserOfferer ? (
-                        <button
-                          className="px-4 py-2 bg-[#f7e8d4] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-pixel disabled:opacity-50"
-                          onClick={() => handleCancelTrade(trade.id)}
-                          disabled={isProcessing}
-                        >
-                          {isProcessing ? "PROCESSING..." : "CANCEL"}
-                        </button>
-                      ) : (
-                        <button
-                          className="px-4 py-2 bg-[#f7e8d4] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-pixel disabled:opacity-50"
-                          onClick={() => handleAcceptTrade(trade.id)}
-                          disabled={isProcessing}
-                        >
-                          {isProcessing ? "PROCESSING..." : "ACCEPT"}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
+        <div className="flex-1 p-4 max-w-3xl mx-auto w-full">
+          <div className="bg-[#fffcb2]/90 backdrop-blur-sm border-2 border-black rounded-lg">
+            <div className="p-4 border-b-2 border-black">
+              <h2 className="text-4xl font-bold font-pixel text-center">TRADE OFFERS</h2>
             </div>
-          ) : (
-            <div className="p-4 text-xl font-bold font-pixel text-center">NO TRADE OFFERS AVAILABLE</div>
-          )}
+
+            {isLoadingTrades ? (
+              <div className="p-4 text-xl font-bold font-pixel text-center">LOADING TRADES...</div>
+            ) : trades.length > 0 ? (
+              <div className="divide-y-2 divide-black">
+                {trades.map((trade) => {
+                  const isUserOfferer = trade.offeredBy.id === user?.id
+                  const isProcessing = processingTradeId === trade.id
+
+                  return (
+                    <div key={trade.id} className="p-4 font-pixel">
+                      <div className="mb-2">
+                        <span className="font-bold">
+                          {isUserOfferer ? "YOUR OFFER TO" : "OFFER FROM"}:{" "}
+                          {isUserOfferer ? trade.offeredTo.username : trade.offeredBy.username}
+                        </span>
+                      </div>
+
+                      <div className="mb-1">
+                        <span className="font-bold">OFFERING: </span>
+                        {trade.offeredCard.type} (Level {trade.offeredCard.level})
+                      </div>
+
+                      {trade.requestedCard ? (
+                        <div className="mb-1">
+                          <span className="font-bold">FOR: </span>
+                          {trade.requestedCard.type} (Level {trade.requestedCard.level})
+                        </div>
+                      ) : (
+                        <div className="mb-1">
+                          <span className="font-bold">ASKING PRICE: </span>
+                          {trade.askingPrice} COINS
+                        </div>
+                      )}
+
+                      <div className="mb-2">
+                        <span className="font-bold">DATE: </span>
+                        {new Date(trade.createdAt).toLocaleDateString()}
+                      </div>
+
+                      <div className="mt-2 flex justify-end gap-2">
+                        {isUserOfferer ? (
+                          <button
+                            className="px-4 py-2 bg-[#f7e8d4] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-pixel disabled:opacity-50"
+                            onClick={() => handleCancelTrade(trade.id)}
+                            disabled={isProcessing}
+                          >
+                            {isProcessing ? "PROCESSING..." : "CANCEL"}
+                          </button>
+                        ) : (
+                          <button
+                            className="px-4 py-2 bg-[#f7e8d4] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-pixel disabled:opacity-50"
+                            onClick={() => handleAcceptTrade(trade.id)}
+                            disabled={isProcessing}
+                          >
+                            {isProcessing ? "PROCESSING..." : "ACCEPT"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="p-4 text-xl font-bold font-pixel text-center">NO TRADE OFFERS AVAILABLE</div>
+            )}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </PageBackground>
   )
 }

@@ -8,6 +8,8 @@ interface LeaderboardProps {
   isFullPage?: boolean
   topCards: LeaderboardCard[]
   isLoading: boolean
+  hideHeader?: boolean
+  className?: string
 }
 
 interface LeaderboardCard {
@@ -16,7 +18,13 @@ interface LeaderboardCard {
   subject: string
 }
 
-export default function Leaderboard({ isFullPage = false, topCards = [], isLoading = true }: LeaderboardProps) {
+export default function Leaderboard({
+  isFullPage = false,
+  topCards = [],
+  isLoading = true,
+  hideHeader = false,
+  className = "",
+}: LeaderboardProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [scrollInfo, setScrollInfo] = useState({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 })
   const [isDragging, setIsDragging] = useState(false)
@@ -110,22 +118,16 @@ export default function Leaderboard({ isFullPage = false, topCards = [], isLoadi
     }
   }, [contentRef, topCards])
 
-  useEffect(() => {
-    isLoading
-  }, [])
-
-  useEffect(() => {
-    topCards
-  }, [])
-
   return (
     <div
-      className={`bg-[#ffe3b2] ${isFullPage ? "w-full max-w-4xl mx-auto" : "w-full"} flex flex-col h-full max-h-svh`}
+      className={`bg-[#ffe3b2] ${isFullPage ? "w-full max-w-4xl mx-auto" : "w-full"} flex flex-col h-full max-h-svh ${className}`}
     >
-      {/* Header div containing the title */}
-      <div className="bg-[#ffd080] p-4 border-b-2 border-black flex-shrink-0">
-        <h2 className="text-4xl font-bold font-pixel">LEADERBOARD</h2>
-      </div>
+      {/* Header div containing the title - only show if hideHeader is false */}
+      {!hideHeader && (
+        <div className="bg-[#ffd080] p-4 border-b-2 border-black flex-shrink-0">
+          <h2 className="text-4xl font-bold font-pixel">LEADERBOARD</h2>
+        </div>
+      )}
 
       {/* Lower div that fills to the bottom of the page */}
       <div className="flex flex-1 overflow-hidden">
