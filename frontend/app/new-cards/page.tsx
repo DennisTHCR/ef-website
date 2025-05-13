@@ -13,6 +13,8 @@ interface NewCard {
   teacherName: string
   subject: string
   quote: string
+  level: number
+  rating: number
 }
 
 export default function NewCardsPage() {
@@ -70,6 +72,8 @@ export default function NewCardsPage() {
                   name={card.teacherName}
                   quote={card.quote}
                   subject={card.subject}
+                  level={card.level}
+                  rating={card.rating}
                 />
               ))}
             </div>

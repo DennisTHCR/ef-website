@@ -7,6 +7,8 @@ interface TeacherCardProps {
   name: string
   quote: string
   subject?: string
+  rating?: number
+  level?: number
   onVote?: (cardId: string) => void
   onSelect?: () => void
   isSelected?: boolean
@@ -75,6 +77,8 @@ export default function TeacherCard({
   name,
   quote,
   subject,
+  rating,
+  level,
   onVote,
   onSelect,
   isSelected = false,
@@ -82,9 +86,13 @@ export default function TeacherCard({
   const nameRef = useRef<HTMLHeadingElement>(null)
   const quoteRef = useRef<HTMLParagraphElement>(null)
   const subjectRef = useRef<HTMLSpanElement>(null)
+  const ratingRef = useRef<HTMLSpanElement>(null)
+  const levelRef = useRef<HTMLSpanElement>(null)
   const [nameFontSize, setNameFontSize] = useState(24) // Default font size in pixels
   const [quoteFontSize, setQuoteFontSize] = useState(18) // Default font size in pixels
   const [subjectFontSize, setSubjectFontSize] = useState(14) // Default font size in pixels
+  const [ratingFontSize, setRatingFontSize] = useState(14)
+  const [levelFontSize, setLevelFontSize] = useState(14)
   const [imageError, setImageError] = useState(false)
 
   // Function to adjust text size to fit container
@@ -157,6 +165,52 @@ export default function TeacherCard({
         setSubjectFontSize(fontSize)
       }
     }
+
+    // Adjust rating font size
+    if (ratingRef.current && rating !== undefined) {
+      const ratingContainer = ratingRef.current.parentElement
+      if (ratingContainer) {
+        const containerStyles = window.getComputedStyle(ratingContainer)
+        const paddingLeft = Number.parseFloat(containerStyles.paddingLeft)
+        const paddingRight = Number.parseFloat(containerStyles.paddingRight)
+
+        const containerWidth = ratingContainer.clientWidth - paddingLeft - paddingRight
+        let fontSize = 14 // Start with default size
+
+        ratingRef.current.style.fontSize = `${fontSize}px`
+
+        // Reduce font size until text fits within container
+        while (ratingRef.current.scrollWidth > containerWidth && fontSize > 8) {
+          fontSize -= 1
+          ratingRef.current.style.fontSize = `${fontSize}px`
+        }
+
+        setRatingFontSize(fontSize)
+      }
+    }
+
+    // Adjust level font size
+    if (levelRef.current && level !== undefined) {
+      const levelContainer = levelRef.current.parentElement
+      if (levelContainer) {
+        const containerStyles = window.getComputedStyle(levelContainer)
+        const paddingLeft = Number.parseFloat(containerStyles.paddingLeft)
+        const paddingRight = Number.parseFloat(containerStyles.paddingRight)
+
+        const containerWidth = levelContainer.clientWidth - paddingLeft - paddingRight
+        let fontSize = 14 // Start with default size
+
+        levelRef.current.style.fontSize = `${fontSize}px`
+
+        // Reduce font size until text fits within container
+        while (levelRef.current.scrollWidth > containerWidth && fontSize > 8) {
+          fontSize -= 1
+          levelRef.current.style.fontSize = `${fontSize}px`
+        }
+
+        setLevelFontSize(fontSize)
+      }
+    }
   }
 
   // Handle image load error
@@ -177,7 +231,7 @@ export default function TeacherCard({
       clearTimeout(timer)
       window.removeEventListener("resize", adjustTextSize)
     }
-  }, [name, quote, subject, imageError])
+  }, [name, quote, subject, rating, level, imageError])
 
   const handleClick = () => {
     if (onVote) {
@@ -209,7 +263,7 @@ export default function TeacherCard({
             className="font-bold font-pixel w-full text-center overflow-hidden"
             style={{ fontSize: `${nameFontSize}px` }}
           >
-            {name}
+            {name}{level ? ` x${level}` : ""}
           </h2>
         </div>
 
@@ -256,6 +310,22 @@ export default function TeacherCard({
               </span>
             </div>
           )}
+
+          {/* Rating tag positioned at bottom right of image */}
+          {rating !== undefined && (
+            <div
+              className="absolute bottom-1 right-1 bg-[#ffb2b2] px-2 py-1 border border-black inline-flex items-center justify-center"
+              style={{ maxWidth: "40%" }}
+            >
+              <span
+                ref={ratingRef}
+                className="font-pixel block text-center overflow-hidden"
+                style={{ fontSize: `${ratingFontSize}px` }}
+              >
+                {rating} HP
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Quote section - fixed height */}
@@ -272,3 +342,4 @@ export default function TeacherCard({
     </div>
   )
 }
+

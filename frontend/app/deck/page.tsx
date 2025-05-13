@@ -191,6 +191,7 @@ export default function DeckPage() {
                           name={card.teacherName}
                           quote={card.quote}
                           subject={card.subject}
+                          level={card.level}
                         />
                       ))}
                     </div>

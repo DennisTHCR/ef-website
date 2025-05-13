@@ -110,6 +110,7 @@ export default function NavMenu() {
           }
         },
       },
+      disabled: menuData.coins < 100,
     },
     {
       id: "openPack",
@@ -141,17 +142,6 @@ export default function NavMenu() {
       id: "viewProfile",
       label: "VIEW PROFILE",
       action: { type: "link", href: "/profile" },
-    },
-    {
-      id: "viewTradeOffers",
-      label: "VIEW TRADE OFFERS",
-      action: { type: "link", href: "/trade-offers" },
-      count: menuData.tradeOffers,
-    },
-    {
-      id: "createTradeOffer",
-      label: "CREATE TRADE OFFER",
-      action: { type: "link", href: "/create-trade" },
     },
     {
       id: "coins",

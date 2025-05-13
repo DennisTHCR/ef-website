@@ -15,6 +15,7 @@ interface BattleCard {
   teacherName: string
   subject: string
   quote: string
+  rating: number
 }
 
 interface LeaderboardCard {
@@ -139,6 +140,7 @@ export default function Home() {
                     onVote={isVoting ? undefined : handleVote}
                     cardHeight={maxCardHeight || undefined}
                     onHeightChange={(height) => handleCardHeightChange(cards.card1.type, height)}
+                    rating={cards.card1.rating}
                   />
                 )}
                 {cards.card2 && (
@@ -150,6 +152,7 @@ export default function Home() {
                     onVote={isVoting ? undefined : handleVote}
                     cardHeight={maxCardHeight || undefined}
                     onHeightChange={(height) => handleCardHeightChange(cards.card2.type, height)}
+                    rating={cards.card2.rating}
                   />
                 )}
               </>
