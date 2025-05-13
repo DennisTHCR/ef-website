@@ -13,7 +13,7 @@ export class Battle {
   @ManyToOne(() => Card)
   card2: Card;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   voter: User;
 
   @Column()

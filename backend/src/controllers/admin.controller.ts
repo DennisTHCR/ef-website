@@ -8,6 +8,8 @@ import { Card } from '../models/card.model';
 import { User } from '../models/user.model';
 import bcrypt from 'bcryptjs';
 import { DealtCard } from '../models/dealt_card.model';
+import { Battle } from '../models/battle.model';
+import { Pack } from '../models/pack.model';
 
 export class AdminController {
   // TEACHER OPERATIONS
@@ -860,6 +862,9 @@ export class AdminController {
       const { id } = req.params;
       const userRepository = getRepository(User);
       const dealtCardRepository = getRepository(DealtCard);
+      const battleRepository = getRepository(Battle);
+      const packRepository = getRepository(Pack);
+
 
       // Find user
       const user = await userRepository.findOne({
