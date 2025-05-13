@@ -341,5 +341,50 @@ class CardController {
             res.status(500).json({ message: 'Server error' });
         }
     }
+    // Buy pack
+    async buyPack(req, res) {
+        try {
+            const userRepository = (0, typeorm_1.getRepository)(user_model_1.User);
+            const packRepository = (0, typeorm_1.getRepository)(pack_model_1.Pack);
+            const seasonRepository = (0, typeorm_1.getRepository)(season_model_1.Season);
+            const user = await userRepository.findOne({
+                where: { id: req.user?.id },
+            });
+            if (!user) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+            // Check if the user has enough balance
+            if (user.coins < 100) {
+                res.status(404).json({ message: 'Not enough balance' });
+            }
+            // Get current active season
+            const currentSeason = await seasonRepository.findOne({
+                where: { isActive: true },
+            });
+            if (!currentSeason) {
+                res.status(404).json({ message: 'No active season found' });
+                return;
+            }
+            // Create a new pack
+            const newPack = packRepository.create({
+                owner: user,
+                seasonId: currentSeason.id,
+            });
+            await packRepository.save(newPack);
+            // Update the user coins
+            user.coins -= 100;
+            await userRepository.save(user);
+            res.status(200).json({
+                message: 'Pack bought successfully',
+                pack: newPack,
+                new_balance: user.coins,
+            });
+        }
+        catch (error) {
+            console.error('Buy pack error:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
 }
 exports.CardController = CardController;
