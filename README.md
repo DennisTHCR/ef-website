@@ -33,8 +33,8 @@ This website is a project for the EF Informatik. The goal is to create a website
   - [x] Authentication
   - [x] Data fetching
   - [x] Voting
-  - [ ] Trading
-  - [ ] Selling cards
+  - [x] Trading
+  - [x] Selling cards
   - [x] Opening packs
 ## Permission
 To make sure everybody is okay with their picture on the website, we will ask every single teacher for their permission. Here is the status of that process:
@@ -48,19 +48,20 @@ To make sure everybody is okay with their picture on the website, we will ask ev
 - [ ] Daniel Gehrig
 - [ ] Daniel Glatz
 - [ ] David Müller
-- [ ] Donat Kaufmann
-- [ ] Gabriela Eugster
+- [x] Donat Kaufmann
+- [x] Gabriela Eugster
 - [ ] Hannes Steinebrunner
 - [ ] Helena Aebersold
 - [ ] Joel Rhiner
 - [ ] Jonas Pommnitz
 - [ ] Pedro Oliveras
 - [ ] Rolf Heeb
-- [ ] Sascha Marchetto
+- [x] Sascha Marchetto
 - [ ] Simon Schälli
 - [ ] Simon Winiger
 - [ ] Thomas Burkardt
 - [ ] Urs Römer
 - [ ] Viola Boye
 - [ ] Zensi Hopf
-
+- [ ] Anselm Zikeli
+- [ ] Valentin Scherrer
