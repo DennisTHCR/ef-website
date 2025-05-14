@@ -10,7 +10,7 @@ import { DealtCard } from '../models/dealt_card.model';
 
 export class BattleController {
   // Get battle cards for voting
-  async getBattleCards(req: AuthRequest, res: Response): Promise<void> {
+  async getBattleCards(_: AuthRequest, res: Response): Promise<void> {
     try {
       const cardRepository = getRepository(Card);
       const seasonRepository = getRepository(Season);
@@ -91,26 +91,47 @@ export class BattleController {
 
       await battleRepository.save(battle);
 
-      // Update card ratings
-      const winner = (await cardRepository.findOne({ where: { type: winnerId === card1Id ? card1.type : card2.type } }))!;
-      const loser = (await cardRepository.findOne({ where: { type: winnerId === card1Id ? card2.type : card1.type } }))!;
+      // Determine winner and loser cards
+      const winner = winnerId === card1Id ? card1 : card2;
+      const loser = winnerId === card1Id ? card2 : card1;
 
+      // Calculate new Elo ratings
       const { winnerNewRating, loserNewRating } = new EloService().calculateNewRatings(
         winner.rating,
         loser.rating
       );
 
-      const winnerCards = await dealtCardRepository.find({ where: { type: winner.type }, relations: ['owner'] });
-      const loserCards = await dealtCardRepository.find({ where: { type: loser.type }, relations: ['owner'] });
+      // Find all users who own these cards
 
-      for (let card of winnerCards) {
-        card.owner.rating -= winner.rating * card.level;
-        userRepository.save(card.owner);
+      const winnerDealtCards = await dealtCardRepository.find({
+        where: { type: winner.type },
+        relations: ['owner']
+      });
+
+      const loserDealtCards = await dealtCardRepository.find({
+        where: { type: loser.type },
+        relations: ['owner']
+      });
+
+      // Update each user's rating
+      const usersToUpdate = new Map<string, User>();
+
+      // Process winner card owners
+
+      for (const dealtCard of winnerDealtCards) {
+        const user = dealtCard.owner;
+        if (!usersToUpdate.has(user.id)) {
+          usersToUpdate.set(user.id, user);
+        }
       }
 
-      for (let card of loserCards) {
-        card.owner.rating -= loser.rating * card.level;
-        userRepository.save(card.owner);
+
+      // Process loser card owners
+      for (const dealtCard of loserDealtCards) {
+        const user = dealtCard.owner;
+        if (!usersToUpdate.has(user.id)) {
+          usersToUpdate.set(user.id, user);
+        }
       }
 
       // Update winner stats
@@ -123,19 +144,14 @@ export class BattleController {
       loser.losses += 1;
       await cardRepository.save(loser);
 
-      for (let card of winnerCards) {
-        card.owner.rating += winner.rating * card.level;
-        userRepository.save(card.owner)
-      }
-
-      for (let card of loserCards) {
-        card.owner.rating += loser.rating * card.level;
-        userRepository.save(card.owner);
+      // Update all affected users' ratings
+      for (const user of usersToUpdate.values()) {
+        // Recalculate the user's rating from scratch
+        await this.recalculateUserRating(user.id);
       }
 
       // Give the voter some coins as a reward
       if (req.user) {
-        const userRepository = getRepository(User);
         const user = await userRepository.findOne({ where: { id: req.user.id } });
 
         if (user) {
@@ -159,8 +175,44 @@ export class BattleController {
     }
   }
 
+  // Helper method to recalculate a user's rating based on their cards
+  private async recalculateUserRating(userId: string): Promise<void> {
+    const userRepository = getRepository(User);
+    const dealtCardRepository = getRepository(DealtCard);
+    const cardRepository = getRepository(Card);
+
+    const user = await userRepository.findOne({ where: { id: userId } });
+    if (!user) return;
+
+    // Get all cards owned by this user
+    const userCards = await dealtCardRepository.find({
+      where: { owner: { id: userId } }
+    });
+
+    // Calculate total rating
+    let totalRating = 0;
+
+    for (const dealtCard of userCards) {
+      const cardInfo = await cardRepository.findOne({
+        where: { type: dealtCard.type },
+        relations: ['season']
+      });
+
+
+      if (cardInfo && cardInfo.season.isActive) {
+        // Apply card level multiplier to rating
+        totalRating += cardInfo.rating * dealtCard.level;
+      }
+    }
+
+    // Update user rating
+    user.rating = totalRating;
+    await userRepository.save(user);
+  }
+
+
   // Get battle history
-  async getBattleHistory(req: AuthRequest, res: Response): Promise<void> {
+  async getBattleHistory(_: AuthRequest, res: Response): Promise<void> {
     try {
       const battleRepository = getRepository(Battle);
 
@@ -178,7 +230,7 @@ export class BattleController {
   }
 
   // Get top ranked cards
-  async getTopRankedCards(req: Request, res: Response): Promise<void> {
+  async getTopRankedCards(_: Request, res: Response): Promise<void> {
     try {
       const cardRepository = getRepository(Card);
       const seasonRepository = getRepository(Season);

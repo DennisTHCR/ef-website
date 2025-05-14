@@ -489,6 +489,7 @@ export class AdminController {
       }
 
       const seasonRepository = getRepository(Season);
+      const userRepository = getRepository(User);
 
       // If new season is active, set all other seasons to inactive
       if (isActive) {
@@ -509,6 +510,12 @@ export class AdminController {
       });
 
       await seasonRepository.save(season);
+
+      const users = await userRepository.find();
+      for (let user of users) {
+        user.rating = 0;
+        userRepository.save(user);
+      }
 
       res.status(201).json({
         message: 'Season created successfully',
