@@ -236,8 +236,6 @@ export class CardController {
         // Update user rating
         user.rating = totalRating;
         await userRepository.save(user);
-
-        await this.recalculateUserRating(req.user.id);
       }
 
       res.status(200).json({
@@ -248,40 +246,6 @@ export class CardController {
       console.error('Open pack error:', error);
       res.status(500).json({ message: 'Server error' });
     }
-  }
-
-  // Helper method to recalculate a user's rating based on their cards
-  private async recalculateUserRating(userId: string): Promise<void> {
-    const userRepository = getRepository(User);
-    const dealtCardRepository = getRepository(DealtCard);
-    const cardRepository = getRepository(Card);
-
-    const user = await userRepository.findOne({ where: { id: userId } });
-    if (!user) return;
-
-    // Get all cards owned by this user
-    const userCards = await dealtCardRepository.find({
-      where: { owner: { id: userId } }
-    });
-
-    // Calculate total rating
-    let totalRating = 0;
-
-    for (const dealtCard of userCards) {
-      const cardInfo = await cardRepository.findOne({
-        where: { type: dealtCard.type },
-        relations: ['season']
-      });
-
-      if (cardInfo && cardInfo.season.isActive) {
-        // Apply card level multiplier to rating
-        totalRating += cardInfo.rating * dealtCard.level;
-      }
-    }
-
-    // Update user rating
-    user.rating = totalRating;
-    await userRepository.save(user);
   }
 
   // Claim daily pack
