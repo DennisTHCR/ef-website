@@ -125,7 +125,8 @@ export class AuthController {
           cards: user.cards,
           lastPackClaim: user.lastPackClaim,
           packs: packs,
-          remainingVotes: user.maxVotesPerDay - user.votesToday,
+          votes: user.votesToday,
+          maxVotes: user.maxVotesPerDay,
         },
       });
     } catch (error) {

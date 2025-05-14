@@ -75,7 +75,7 @@ export class BattleController {
         user.lastVoteReset = now;
       }
 
-      if (user.votesToday - user.maxVotesPerDay <= 0) {
+      if (user.votesToday >= user.maxVotesPerDay) {
         res.status(403).json({
           message: 'Daily vote limit reached',
           votesToday: user.votesToday,
