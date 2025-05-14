@@ -6,6 +6,7 @@ import { User } from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { EloService } from '../services/elo.service';
 import { Season } from '../models/season.model';
+import { DealtCard } from '../models/dealt_card.model';
 
 export class BattleController {
   // Get battle cards for voting
@@ -67,6 +68,8 @@ export class BattleController {
       }
 
       const cardRepository = getRepository(Card);
+      const dealtCardRepository = getRepository(DealtCard);
+      const userRepository = getRepository(User);
       const battleRepository = getRepository(Battle);
 
       // Get the cards
@@ -97,6 +100,19 @@ export class BattleController {
         loser.rating
       );
 
+      const winnerCards = await dealtCardRepository.find({ where: { type: winner.type }, relations: ['owner'] });
+      const loserCards = await dealtCardRepository.find({ where: { type: loser.type }, relations: ['owner'] });
+
+      for (let card of winnerCards) {
+        card.owner.rating -= winner.rating * card.level;
+        userRepository.save(card.owner);
+      }
+
+      for (let card of loserCards) {
+        card.owner.rating -= loser.rating * card.level;
+        userRepository.save(card.owner);
+      }
+
       // Update winner stats
       winner.rating = winnerNewRating;
       winner.wins += 1;
@@ -106,6 +122,16 @@ export class BattleController {
       loser.rating = loserNewRating;
       loser.losses += 1;
       await cardRepository.save(loser);
+
+      for (let card of winnerCards) {
+        card.owner.rating += winner.rating * card.level;
+        userRepository.save(card.owner)
+      }
+
+      for (let card of loserCards) {
+        card.owner.rating += loser.rating * card.level;
+        userRepository.save(card.owner);
+      }
 
       // Give the voter some coins as a reward
       if (req.user) {

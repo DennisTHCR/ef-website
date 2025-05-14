@@ -71,6 +71,7 @@ export class CardController {
   // Open a pack
   async openPack(req: AuthRequest, res: Response): Promise<void> {
     try {
+      const userRepository = getRepository(User);
       const packRepository = getRepository(Pack);
       const cardRepository = getRepository(Card);
       const seasonRepository = getRepository(Season);
@@ -207,6 +208,16 @@ export class CardController {
           }
         }
       }
+
+      const user = (await userRepository.findOne({ where: { id: req.user?.id } }))!;
+      const seasonCards = await dealtCardRepository.find({ where: { owner: { id: user.id } } });
+      let sum = 0;
+      for (let card of seasonCards) {
+        let cardInfo = await cardRepository.findOne({ where: { type: card.type }, relations: ['season'] });
+        if (cardInfo?.season.isActive) sum += cardInfo?.rating! * cardInfo?.level!;
+      }
+      user.rating = sum;
+      userRepository.save(user);
 
       res.status(200).json({
         message: 'Pack opened successfully',
