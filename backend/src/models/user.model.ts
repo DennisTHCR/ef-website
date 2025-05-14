@@ -29,4 +29,13 @@ export class User {
 
   @Column({ default: () => "datetime('now')" })
   lastPackClaim: Date;
+
+  @Column({ default: 0 })
+  votesToday: number;
+
+  @Column({ default: () => "datetime('now')" })
+  lastVoteReset: Date;
+
+  @Column({ default: 10 })
+  maxVotesPerDay: number;
 }

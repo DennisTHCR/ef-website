@@ -55,6 +55,35 @@ export class BattleController {
   // Vote on a battle
   async voteBattle(req: AuthRequest, res: Response): Promise<void> {
     try {
+      const userRepository = getRepository(User);
+      const user = await userRepository.findOne({ where: { id: req.user?.id } });
+
+      if (!user) {
+        res.status(401).json({ message: 'User not authenticated' });
+        return;
+      }
+
+      const now = new Date();
+      const lastReset = new Date(user.lastVoteReset);
+
+      if (
+        lastReset.getDate() !== now.getDate() ||
+        lastReset.getMonth() !== now.getMonth() ||
+        lastReset.getFullYear() !== now.getFullYear()
+      ) {
+        user.votesToday = 0;
+        user.lastVoteReset = now;
+      }
+
+      if (user.votesToday >= user.maxVotesPerDay) {
+        res.status(403).json({
+          message: 'Daily vote limit reached',
+          votesToday: user.votesToday,
+          maxVotes: user.maxVotesPerDay
+        });
+        return;
+      }
+
       const { card1Id, card2Id, winnerId } = req.body;
 
       if (!card1Id || !card2Id || !winnerId) {
@@ -69,7 +98,6 @@ export class BattleController {
 
       const cardRepository = getRepository(Card);
       const dealtCardRepository = getRepository(DealtCard);
-      const userRepository = getRepository(User);
       const battleRepository = getRepository(Battle);
 
       // Get the cards
@@ -178,6 +206,7 @@ export class BattleController {
         const user = await userRepository.findOne({ where: { id: req.user.id } });
 
         if (user) {
+          user.votesToday += 1;
           user.coins += 10; // Reward for voting
           await userRepository.save(user);
         }
@@ -197,42 +226,6 @@ export class BattleController {
       res.status(500).json({ message: 'Server error' });
     }
   }
-
-  // Helper method to recalculate a user's rating based on their cards
-  async recalculateUserRating(userId: string): Promise<void> {
-    const userRepository = getRepository(User);
-    const dealtCardRepository = getRepository(DealtCard);
-    const cardRepository = getRepository(Card);
-
-    const user = await userRepository.findOne({ where: { id: userId } });
-    if (!user) return;
-
-    // Get all cards owned by this user
-    const userCards = await dealtCardRepository.find({
-      where: { owner: { id: userId } }
-    });
-
-    // Calculate total rating
-    let totalRating = 0;
-
-    for (const dealtCard of userCards) {
-      const cardInfo = await cardRepository.findOne({
-        where: { type: dealtCard.type },
-        relations: ['season']
-      });
-
-
-      if (cardInfo && cardInfo.season.isActive) {
-        // Apply card level multiplier to rating
-        totalRating += cardInfo.rating * dealtCard.level;
-      }
-    }
-
-    // Update user rating
-    user.rating = totalRating;
-    await userRepository.save(user);
-  }
-
 
   // Get battle history
   async getBattleHistory(_: AuthRequest, res: Response): Promise<void> {
