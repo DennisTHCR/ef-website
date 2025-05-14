@@ -146,8 +146,31 @@ export class BattleController {
 
       // Update all affected users' ratings
       for (const user of usersToUpdate.values()) {
-        // Recalculate the user's rating from scratch
-        await this.recalculateUserRating(user.id);
+        if (!user) continue;
+        // Get all cards owned by this user
+        const userCards = await dealtCardRepository.find({
+          where: { owner: { id: user.id } }
+        });
+
+        // Calculate total rating
+        let totalRating = 0;
+
+        for (const dealtCard of userCards) {
+          const cardInfo = await cardRepository.findOne({
+            where: { type: dealtCard.type },
+            relations: ['season']
+          });
+
+
+          if (cardInfo && cardInfo.season.isActive) {
+            // Apply card level multiplier to rating
+            totalRating += cardInfo.rating * dealtCard.level;
+          }
+        }
+
+        // Update user rating
+        user.rating = totalRating;
+        await userRepository.save(user);
       }
 
       // Give the voter some coins as a reward
@@ -176,7 +199,7 @@ export class BattleController {
   }
 
   // Helper method to recalculate a user's rating based on their cards
-  private async recalculateUserRating(userId: string): Promise<void> {
+  async recalculateUserRating(userId: string): Promise<void> {
     const userRepository = getRepository(User);
     const dealtCardRepository = getRepository(DealtCard);
     const cardRepository = getRepository(Card);

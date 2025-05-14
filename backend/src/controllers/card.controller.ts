@@ -75,6 +75,7 @@ export class CardController {
       const cardRepository = getRepository(Card);
       const seasonRepository = getRepository(Season);
       const dealtCardRepository = getRepository(DealtCard);
+      const userRepository = getRepository(User);
 
       // Find an unopened pack owned by the user
       const pack = await packRepository.findOne({
@@ -211,6 +212,31 @@ export class CardController {
 
       // Recalculate the user's rating
       if (req.user) {
+        const user = (await userRepository.findOne({ where: { id: req.user.id } }))!;
+
+        const userCards = await dealtCardRepository.find({
+          where: { owner: { id: req.user.id } }
+        });
+
+        // Calculate total rating
+        let totalRating = 0;
+
+        for (const dealtCard of userCards) {
+          const cardInfo = await cardRepository.findOne({
+            where: { type: dealtCard.type },
+            relations: ['season']
+          });
+
+          if (cardInfo && cardInfo.season.isActive) {
+            // Apply card level multiplier to rating
+            totalRating += cardInfo.rating * dealtCard.level;
+          }
+        }
+
+        // Update user rating
+        user.rating = totalRating;
+        await userRepository.save(user);
+
         await this.recalculateUserRating(req.user.id);
       }
 
