@@ -15,5 +15,6 @@ export const dbConfig: ConnectionOptions = {
   database: './db/teacher-card-game.sqlite',
   entities: [User, Card, DealtCard, Battle, Season, Pack, Trade, Quote, Subject, Teacher],
   synchronize: true,
-  logging: true
+  logging: true,
+  migrations: ["src/migrations/**/*.ts"],
 };
