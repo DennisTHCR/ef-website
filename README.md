@@ -48,15 +48,15 @@ To make sure everybody is okay with their picture on the website, we will ask ev
 - [ ] Daniel Gehrig
 - [ ] Daniel Glatz
 - [ ] David Müller
-- [ ] Donat Kaufmann
-- [ ] Gabriela Eugster
+- [x] Donat Kaufmann
+- [x] Gabriela Eugster
 - [ ] Hannes Steinebrunner
 - [ ] Helena Aebersold
 - [ ] Joel Rhiner
 - [ ] Jonas Pommnitz
 - [ ] Pedro Oliveras
 - [ ] Rolf Heeb
-- [ ] Sascha Marchetto
+- [x] Sascha Marchetto
 - [ ] Simon Schälli
 - [ ] Simon Winiger
 - [ ] Thomas Burkardt
