@@ -368,11 +368,6 @@ export class CardController {
       // Remove the sacrifice cards
       await dealtCardRepository.remove(sacrificeCards);
 
-      // Recalculate user rating after upgrading
-      if (req.user) {
-        await this.recalculateUserRating(req.user.id);
-      }
-
       res.status(200).json({
         message: 'Card upgraded successfully',
         card,
@@ -390,6 +385,7 @@ export class CardController {
 
       const dealtCardRepository = getRepository(DealtCard);
       const userRepository = getRepository(User);
+      const cardRepository = getRepository(Card);
 
       // Get the card
       const card = await dealtCardRepository.findOne({
@@ -427,8 +423,33 @@ export class CardController {
       // Remove the card
       await dealtCardRepository.remove(card);
 
-      // Recalculate user rating after selling a card
-      await this.recalculateUserRating(req.user.id);
+      // Recalculate the user's rating
+      if (req.user) {
+        const user = (await userRepository.findOne({ where: { id: req.user.id } }))!;
+
+        const userCards = await dealtCardRepository.find({
+          where: { owner: { id: req.user.id } }
+        });
+
+        // Calculate total rating
+        let totalRating = 0;
+
+        for (const dealtCard of userCards) {
+          const cardInfo = await cardRepository.findOne({
+            where: { type: dealtCard.type },
+            relations: ['season']
+          });
+
+          if (cardInfo && cardInfo.season.isActive) {
+            // Apply card level multiplier to rating
+            totalRating += cardInfo.rating * dealtCard.level;
+          }
+        }
+
+        // Update user rating
+        user.rating = totalRating;
+        await userRepository.save(user);
+      }
 
       res.status(200).json({
         message: 'Card sold successfully',
