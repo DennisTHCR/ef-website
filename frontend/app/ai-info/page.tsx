@@ -81,9 +81,8 @@ export default function AIInfoPage() {
                 </h3>
                 <div className="bg-white/70 p-3 md:p-4 border-2 border-black">
                   <p className="font-pixel text-sm md:text-base">
-                    Quotemon uses AI not only for image generation but also for game balancing and quote selection.
-                    We've implemented algorithms that help ensure fair gameplay while maintaining the authentic spirit
-                    of the original quotes. The pixel art style was chosen to create a nostalgic gaming experience while
+                    Quotemon uses AI only for image generation.
+                    The pixel art style was chosen to create a nostalgic gaming experience while
                     also being suitable for AI generation.
                   </p>
                 </div>

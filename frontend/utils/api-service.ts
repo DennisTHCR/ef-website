@@ -184,3 +184,10 @@ export async function getTrainerCards(trainerId: string) {
 export async function getAllSeasons() {
   return fetchAPI('/seasons/')
 }
+
+export async function sellCard(cardId: string) {
+  return fetchAPI('/cards/sell/', {
+    method: "POST",
+    body: JSON.stringify({ cardId })
+  })
+}

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import TeacherCard from "./teacher-card"
 import { toast } from "sonner"
+import { sellCard } from "@/utils/api-service"
 
 interface CardDetailViewProps {
   card: {
@@ -49,10 +50,9 @@ export default function CardDetailView({ card, onClose, onCardSold }: CardDetail
       // This is where we would call the API to sell the card
       // await sellCard(card.id)
 
-      // For now, we'll simulate the API call with a timeout
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await sellCard(card.id);
 
-      toast.success(`Card level reduced and received ${coinValue} coins!`)
+      toast.success(`Card level reduced and received 1 extra vote!`)
       setShowConfirmation(false)
       onCardSold(card.id, willBeRemoved)
     } catch (error) {
