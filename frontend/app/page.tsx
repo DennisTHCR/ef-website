@@ -6,7 +6,7 @@ import Header from "@/components/header"
 import TeacherCard from "@/components/teacher-card"
 import Leaderboard from "@/components/leaderboard"
 import PageBackground from "@/components/page-background"
-import { getBattleCards, getTopRankedCards, voteOnBattle } from "@/utils/api-service"
+import { getBattleCards, getTopRankedCards, getUserProfile, voteOnBattle } from "@/utils/api-service"
 import { useAuth } from "@/contexts/auth-context"
 import { toast } from "sonner"
 
@@ -24,6 +24,11 @@ interface LeaderboardCard {
   subject: string
 }
 
+interface UserProfile {
+  votes: number
+  maxVotes: number
+}
+
 export default function Home() {
   const [cards, setCards] = useState<{ card1: BattleCard | null; card2: BattleCard | null }>({
     card1: null,
@@ -37,6 +42,7 @@ export default function Home() {
   const router = useRouter()
   const [cardHeights, setCardHeights] = useState<{ [key: string]: number }>({})
   const [maxCardHeight, setMaxCardHeight] = useState<number | null>(null)
+  const [remainingVotes, setRemainingVotes] = useState<number | null>(null)
 
   // Check authentication and redirect if needed
   useEffect(() => {
@@ -49,6 +55,7 @@ export default function Home() {
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       fetchBattleCards()
+      fetchRemainingVotes()
     }
   }, [isAuthenticated, authLoading])
 
@@ -94,8 +101,12 @@ export default function Home() {
     try {
       await voteOnBattle(cards.card1.type, cards.card2.type, winnerId)
       toast.success("Vote recorded successfully!")
+
       // Fetch new cards for the next battle
       fetchBattleCards()
+
+      // Refetch the remaining votes after voting
+      fetchRemainingVotes()
     } catch (error) {
       console.error("Failed to vote:", error)
       toast.error("Failed to record your vote. Please try again.")
@@ -111,6 +122,20 @@ export default function Home() {
     }))
   }
 
+  async function fetchRemainingVotes() {
+    try {
+      // Fetch profile data from the auth/profile endpoint
+      const profileData: UserProfile = (await getUserProfile()).user;
+
+      // Calculate remaining votes
+      const remaining = profileData.maxVotes - profileData.votes
+      setRemainingVotes(remaining)
+    } catch (error) {
+      console.error("Failed to fetch remaining votes:", error)
+      toast.error("Failed to load vote count. Please refresh the page.")
+    }
+  }
+
   // Don't render anything while checking authentication or redirecting
   if (authLoading || (!isAuthenticated && !authLoading)) {
     return null
@@ -122,6 +147,16 @@ export default function Home() {
       <div className="h-screen w-screen max-h-screen max-w-screen overflow-hidden flex flex-col">
         {/* Header in a separate div */}
         <Header className="flex-shrink-0" />
+
+        {/* Votes counter */}
+        <div className="flex justify-center items-center py-2 bg-black/10 backdrop-blur-sm">
+          <div className="font-pixel text-lg flex items-center gap-2">
+            <span>VOTES REMAINING:</span>
+            <span className="bg-white/80 px-3 py-1 rounded-md text-xl min-w-[3rem] text-center">
+              {remainingVotes !== null ? remainingVotes : "..."}
+            </span>
+          </div>
+        </div>
 
         {/* Content div with game on left and leaderboard on right */}
         <div className="flex flex-1 min-h-0">
@@ -168,3 +203,4 @@ export default function Home() {
     </PageBackground>
   )
 }
+
