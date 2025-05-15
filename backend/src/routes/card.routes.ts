@@ -10,7 +10,6 @@ router.get('/:id', cardController.getCardById);
 router.get('/type/:type', cardController.getCardByType);
 router.post('/open-pack', authMiddleware, cardController.openPack);
 router.post('/claim-daily', authMiddleware, cardController.claimDailyPack);
-router.post('/upgrade', authMiddleware, cardController.upgradeCard);
 router.post('/sell', authMiddleware, cardController.sellCard);
 router.post('/buy-pack', authMiddleware, cardController.buyPack);
 

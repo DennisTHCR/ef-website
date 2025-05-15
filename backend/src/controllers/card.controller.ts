@@ -312,72 +312,6 @@ export class CardController {
     }
   }
 
-  // Upgrade a card
-  async upgradeCard(req: AuthRequest, res: Response): Promise<void> {
-    try {
-      const { cardId, sacrificeCardIds } = req.body;
-
-
-      if (!sacrificeCardIds || !Array.isArray(sacrificeCardIds) || sacrificeCardIds.length === 0) {
-        res.status(400).json({ message: 'No sacrifice cards provided' });
-        return;
-      }
-
-      const dealtCardRepository = getRepository(DealtCard);
-
-      // Get the card to upgrade
-      const card = await dealtCardRepository.findOne({
-        where: { id: cardId, owner: { id: req.user?.id } },
-      });
-
-      if (!card) {
-        res.status(404).json({ message: 'Card not found or not owned by user' });
-        return;
-      }
-
-      // Get all sacrifice cards
-      const sacrificeCards = await dealtCardRepository.find({
-        where: sacrificeCardIds.map(id => ({ id, owner: { id: req.user?.id } })),
-      });
-
-      if (sacrificeCards.length !== sacrificeCardIds.length) {
-        res.status(400).json({ message: 'One or more sacrifice cards not found or not owned by user' });
-        return;
-      }
-
-      // Ensure we're not sacrificing the same card we're upgrading
-      if (sacrificeCardIds.includes(cardId)) {
-        res.status(400).json({ message: 'Cannot sacrifice the card being upgraded' });
-        return;
-      }
-
-      // Ensure all sacrifice cards are of the same teacher and subject
-      for (const sacrificeCard of sacrificeCards) {
-        if (sacrificeCard.type !== card.type) {
-          res.status(400).json({
-            message: 'All sacrifice cards must have the same teacher and subject as the card being upgraded'
-          });
-          return;
-        }
-      }
-
-      // Update the card level
-      card.level += sacrificeCards.length;
-      await dealtCardRepository.save(card);
-
-      // Remove the sacrifice cards
-      await dealtCardRepository.remove(sacrificeCards);
-
-      res.status(200).json({
-        message: 'Card upgraded successfully',
-        card,
-      });
-    } catch (error) {
-      console.error('Upgrade card error:', error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  }
-
   // Sell a card
   async sellCard(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -397,12 +331,7 @@ export class CardController {
         return;
       }
 
-      // Calculate the sell value based on level and rating
-      const baseValue = 50;
-      const levelBonus = (card.level - 1) * 25;
-      const sellValue = Math.floor(baseValue + levelBonus);
-
-      // Update user coins
+      // Update user votes
       if (!req.user) {
         res.status(401).json({ message: 'User not authenticated' });
         return;
@@ -417,11 +346,15 @@ export class CardController {
         return;
       }
 
-      user.coins += sellValue;
+      user.votesToday -= 1;
       await userRepository.save(user);
 
-      // Remove the card
-      await dealtCardRepository.remove(card);
+      card.level -= 1;
+      await dealtCardRepository.save(card);
+      if (card.level <= 0) {
+        // Remove the card
+        await dealtCardRepository.remove(card);
+      }
 
       // Recalculate the user's rating
       if (req.user) {
@@ -453,8 +386,6 @@ export class CardController {
 
       res.status(200).json({
         message: 'Card sold successfully',
-        coinsEarned: sellValue,
-        totalCoins: user.coins,
       });
     } catch (error) {
       console.error('Sell card error:', error);
