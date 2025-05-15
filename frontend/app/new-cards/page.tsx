@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Header from "@/components/header"
+import CollapsibleHeader from "@/components/collapsible-header"
 import TeacherCard from "@/components/teacher-card"
 import PageBackground from "@/components/page-background"
 import { useAuth } from "@/contexts/auth-context"
@@ -55,7 +55,7 @@ export default function NewCardsPage() {
   return (
     <PageBackground>
       <main className="min-h-screen flex flex-col">
-        <Header />
+        <CollapsibleHeader />
 
         <div className="flex-1 p-4">
           <div className="bg-[#fffdd0]/90 backdrop-blur-sm p-6 rounded-lg border-2 border-black">

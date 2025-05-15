@@ -125,7 +125,7 @@ export default function Home() {
   async function fetchRemainingVotes() {
     try {
       // Fetch profile data from the auth/profile endpoint
-      const profileData: UserProfile = (await getUserProfile()).user;
+      const profileData: UserProfile = (await getUserProfile()).user
 
       // Calculate remaining votes
       const remaining = profileData.maxVotes - profileData.votes
@@ -203,4 +203,3 @@ export default function Home() {
     </PageBackground>
   )
 }
-

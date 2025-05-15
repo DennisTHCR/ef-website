@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import Header from "@/components/header"
+import CollapsibleHeader from "@/components/collapsible-header"
 import PageBackground from "@/components/page-background"
 import { useAuth } from "@/contexts/auth-context"
 import { getUserProfile, getTopTrainers } from "@/utils/api-service"
@@ -66,7 +66,7 @@ export default function ProfilePage() {
   return (
     <PageBackground>
       <main className="min-h-screen flex flex-col">
-        <Header />
+        <CollapsibleHeader />
 
         <div className="flex-1 p-4 max-w-3xl mx-auto w-full">
           {isLoadingProfile ? (

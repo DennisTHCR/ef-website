@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useEffect, useRef, useState } from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface LeaderboardProps {
   isFullPage?: boolean
@@ -28,6 +29,7 @@ export default function Leaderboard({
   const contentRef = useRef<HTMLDivElement>(null)
   const [scrollInfo, setScrollInfo] = useState({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 })
   const [isDragging, setIsDragging] = useState(false)
+  const isMobile = useIsMobile()
 
   // Handle scroll events to update scrubber position
   const handleScroll = () => {
@@ -125,7 +127,20 @@ export default function Leaderboard({
       {/* Header div containing the title - only show if hideHeader is false */}
       {!hideHeader && (
         <div className="bg-[#ffd080] p-4 border-b-2 border-black flex-shrink-0">
-          <h2 className="text-4xl font-bold font-pixel">LEADERBOARD</h2>
+          {isMobile ? (
+            <h2
+              className="text-2xl font-bold font-pixel text-center"
+              style={{
+                letterSpacing: "-0.05em",
+                paddingLeft: "0.5rem",
+                paddingRight: "0.5rem",
+              }}
+            >
+              LEADERBOARD
+            </h2>
+          ) : (
+            <h2 className="text-4xl font-bold font-pixel text-center">LEADERBOARD</h2>
+          )}
         </div>
       )}
 
@@ -146,8 +161,17 @@ export default function Leaderboard({
               <div className="p-4 text-xl font-bold font-pixel">LOADING...</div>
             ) : topCards.length > 0 ? (
               topCards.map((card, index) => (
-                <div key={index} className="p-4 text-xl font-bold font-pixel">
-                  {card.teacherName}: {card.subject}
+                <div key={index} className="p-4 font-bold font-pixel">
+                  {isMobile ? (
+                    <div>
+                      <div className="text-xl">{card.teacherName}:</div>
+                      <div className="text-xl">{card.subject}</div>
+                    </div>
+                  ) : (
+                    <div className="text-xl">
+                      {card.teacherName}: {card.subject}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (

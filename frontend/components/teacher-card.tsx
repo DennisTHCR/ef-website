@@ -247,8 +247,9 @@ export default function TeacherCard({
 
   return (
     <div
-      className={`bg-[#f7e8d4] rounded-3xl p-3 border-2 ${isSelected ? "border-red-500 border-4" : "border-black"
-        } shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-shadow cursor-pointer`}
+      className={`bg-[#f7e8d4] rounded-3xl p-3 border-2 ${
+        isSelected ? "border-red-500 border-4" : "border-black"
+      } shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-5px] hover:translate-x-[-5px] transition-all duration-200 cursor-pointer`}
       style={{
         width: `${CARD_WIDTH}px`,
         height: `${CARD_HEIGHT}px`,
@@ -263,7 +264,8 @@ export default function TeacherCard({
             className="font-bold font-pixel w-full text-center overflow-hidden"
             style={{ fontSize: `${nameFontSize}px` }}
           >
-            {name}{level ? ` x${level}` : ""}
+            {name}
+            {level ? ` x${level}` : ""}
           </h2>
         </div>
 
@@ -342,4 +344,3 @@ export default function TeacherCard({
     </div>
   )
 }
-
