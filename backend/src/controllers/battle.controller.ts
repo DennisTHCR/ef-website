@@ -56,7 +56,7 @@ export class BattleController {
   async voteBattle(req: AuthRequest, res: Response): Promise<void> {
     try {
       const userRepository = getRepository(User);
-      const user = await userRepository.findOne({ where: { id: req.user?.id } });
+      let user = await userRepository.findOne({ where: { id: req.user?.id } });
 
       if (!user) {
         res.status(401).json({ message: 'User not authenticated' });
@@ -75,7 +75,7 @@ export class BattleController {
         user.lastVoteReset = now;
       }
 
-      if (user.votesToday >= user.maxVotesPerDay) {
+      if (user.votesToday >= 10) {
         res.status(403).json({
           message: 'Daily vote limit reached',
           votesToday: user.votesToday,
@@ -173,11 +173,11 @@ export class BattleController {
       await cardRepository.save(loser);
 
       // Update all affected users' ratings
-      for (const user of usersToUpdate.values()) {
-        if (!user) continue;
+      for (const userToUpdate of usersToUpdate.values()) {
+        if (!userToUpdate) continue;
         // Get all cards owned by this user
         const userCards = await dealtCardRepository.find({
-          where: { owner: { id: user.id } }
+          where: { owner: { id: userToUpdate.id } }
         });
 
         // Calculate total rating
@@ -197,20 +197,13 @@ export class BattleController {
         }
 
         // Update user rating
-        user.rating = totalRating;
-        await userRepository.save(user);
+        userToUpdate.rating = totalRating;
+        await userRepository.save(userToUpdate);
       }
 
-      // Give the voter some coins as a reward
-      if (req.user) {
-        const user = await userRepository.findOne({ where: { id: req.user.id } });
-
-        if (user) {
-          user.votesToday += 1;
-          user.coins += 10; // Reward for voting
-          await userRepository.save(user);
-        }
-      }
+      user.votesToday += 1;
+      user.coins += 10; // Reward for voting
+      await userRepository.save(user);
 
       res.status(200).json({
         message: 'Vote recorded successfully',
