@@ -45,7 +45,7 @@ To make sure everybody is okay with their picture on the website, we will ask ev
 - [x] Julia Strasser
 - [ ] Astrid Bohren
 - [ ] Beat Gasser
-- [ ] Daniel Gehrig
+- [x] Daniel Gehrig
 - [ ] Daniel Glatz
 - [ ] David Müller
 - [x] Donat Kaufmann
