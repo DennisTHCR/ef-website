@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Card } from './card.model';
 
 @Entity('seasons')
@@ -18,6 +18,6 @@ export class Season {
   @Column({ default: true })
   isActive: boolean;
 
-  @OneToMany(() => Card, card => card.season)
+  @OneToMany(() => Card, card => card.season, { onDelete: "CASCADE" })
   cards: Card[];
 }
