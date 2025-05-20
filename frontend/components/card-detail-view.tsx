@@ -28,10 +28,6 @@ export default function CardDetailView({ card, onClose, onCardSold }: CardDetail
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [isSellingCard, setIsSellingCard] = useState(false)
 
-  // Calculate coin value for selling one level of the card
-  // Base value of 10 coins per level
-  const coinValue = 10
-
   // Determine what will happen after selling
   const willBeRemoved = card.level === 1
   const newLevel = card.level - 1
@@ -155,7 +151,7 @@ export default function CardDetailView({ card, onClose, onCardSold }: CardDetail
             {/* Sell value information */}
             <div className="mt-2 pt-3 border-t-2 border-black">
               <h3 className="text-lg md:text-xl font-bold font-pixel mb-1">SELL VALUE (1 CARD)</h3>
-              <p className="text-base md:text-lg font-pixel">{coinValue} COINS</p>
+              <p className="text-base md:text-lg font-pixel">1 VOTE</p>
             </div>
           </div>
 
@@ -189,7 +185,7 @@ export default function CardDetailView({ card, onClose, onCardSold }: CardDetail
 
             <div className="mb-6 text-center">
               <p className="text-lg font-pixel mb-4">Are you sure you want to sell one card?</p>
-              <p className="text-lg font-pixel font-bold">You will receive {coinValue} coins.</p>
+              <p className="text-lg font-pixel font-bold">You will receive 1 vote.</p>
 
               {/* Warning about what happens */}
               <div className="mt-4 p-3 bg-[#ffd080] border-2 border-black">
