@@ -44,24 +44,24 @@ To make sure everybody is okay with their picture on the website, we will ask ev
 - [x] Franz Hahn
 - [x] Julia Strasser
 - [ ] Astrid Bohren
-- [ ] Beat Gasser
+- [x] Beat Gasser
 - [x] Daniel Gehrig
 - [ ] Daniel Glatz
 - [ ] David Müller
 - [x] Donat Kaufmann
 - [x] Gabriela Eugster
-- [ ] Hannes Steinebrunner
+- [x] Hannes Steinebrunner
 - [ ] Helena Aebersold
 - [ ] Joel Rhiner
 - [ ] Jonas Pommnitz
 - [ ] Pedro Oliveras
-- [ ] Rolf Heeb
+- [x] Rolf Heeb
 - [x] Sascha Marchetto
-- [ ] Simon Schälli
+- [x] Simon Schälli
 - [ ] Simon Winiger
 - [ ] Thomas Burkardt
 - [ ] Urs Römer
 - [ ] Viola Boye
-- [ ] Zensi Hopf
+- [x] Zensi Hopf
 - [ ] Anselm Zikeli
 - [ ] Valentin Scherrer
