@@ -51,7 +51,7 @@ To make sure everybody is okay with their picture on the website, we will ask ev
 - [x] Donat Kaufmann
 - [x] Gabriela Eugster
 - [x] Hannes Steinebrunner
-- [ ] Helena Aebersold
+- [x] Helena Aebersold
 - [ ] Joel Rhiner
 - [ ] Jonas Pommnitz
 - [ ] Pedro Oliveras
