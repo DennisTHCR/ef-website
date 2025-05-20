@@ -7,10 +7,10 @@ export class Battle {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Card)
+  @ManyToOne(() => Card, { onDelete: "CASCADE" })
   card1: Card;
 
-  @ManyToOne(() => Card)
+  @ManyToOne(() => Card, { onDelete: "CASCADE" })
   card2: Card;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
