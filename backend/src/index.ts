@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { createConnection } from 'typeorm';
+import { createConnection, getManager } from 'typeorm';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import cardRoutes from './routes/card.routes';
