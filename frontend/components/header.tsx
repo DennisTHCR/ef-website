@@ -36,9 +36,8 @@ export default function Header() {
           <span className="text-2xl md:text-4xl lg:text-5xl block">QUOTEMON</span>
           <div className="flex flex-row sm:ml-2">
             <span className="text-2xl md:text-4xl lg:text-5xl">KSW:</span>
-            <span className="text-2xl md:text-4xl lg:text-5xl ml-2">SEASON</span>
+            <span className="text-2xl md:text-4xl lg:text-5xl ml-2">{seasonName}</span>
           </div>
-          <span className="text-2xl md:text-4xl lg:text-5xl block sm:ml-4">BUN</span>
         </div>
       </Link>
 
