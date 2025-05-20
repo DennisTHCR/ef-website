@@ -21,7 +21,7 @@ export class Card {
   @Column({ default: 1 })
   level: number;
 
-  @ManyToOne(() => Season)
+  @ManyToOne(() => Season, { onDelete: "CASCADE" })
   season: Season;
 
   @Column({ default: 0 })

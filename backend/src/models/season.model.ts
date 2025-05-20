@@ -18,6 +18,6 @@ export class Season {
   @Column({ default: true })
   isActive: boolean;
 
-  @OneToMany(() => Card, card => card.season, { onDelete: "CASCADE" })
+  @OneToMany(() => Card, card => card.season, { cascade: true })
   cards: Card[];
 }
